@@ -1,0 +1,184 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MemberStatus {
+  ACTIVE
+  ALUM
+  PENDING
+}
+
+enum SpeakerStatus {
+  UPCOMING
+  PAST
+}
+
+enum MeetingStatus {
+  CONFIRMED
+  TENTATIVE
+  OPEN
+}
+
+enum ApplicationType {
+  STUDENT
+  SPEAKER
+}
+
+enum ApplicationStatus {
+  NEW
+  REVIEWING
+  APPROVED
+  REJECTED
+  ARCHIVED
+}
+
+enum OfficerRole {
+  PRESIDENT
+  VP
+  SECRETARY
+  TREASURER
+  ADVISOR
+}
+
+enum PageStatus {
+  LIVE
+  DRAFT
+}
+
+model Officer {
+  id             String       @id @default(cuid())
+  name           String
+  email          String       @unique
+  passwordHash   String
+  role           OfficerRole
+  classYear      String?
+  bio            String?
+  permissions    String[]     @default([])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  notes          Note[]
+  reviewedApps   Application[] @relation("ReviewedBy")
+  pageUpdates    PageContent[]
+}
+
+model Member {
+  id        String       @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String       @unique
+  gradYear  String
+  status    MemberStatus @default(PENDING)
+  joinedAt  DateTime     @default(now())
+  role      String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@index([status])
+}
+
+model Speaker {
+  id          String        @id @default(cuid())
+  firstName   String
+  lastName    String
+  firm        String
+  title       String
+  bio         String        @default("")
+  topic       String        @default("")
+  photoUrl    String?
+  linkedinUrl String?
+  industry    String?
+  status      SpeakerStatus @default(UPCOMING)
+  sessionDate DateTime?
+  season      String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  meetings    Meeting[]
+
+  @@index([status])
+}
+
+model Meeting {
+  id        String        @id @default(cuid())
+  date      DateTime
+  time      String
+  location  String
+  topic     String        @default("")
+  format    String        @default("Talk + Q&A")
+  duration  String        @default("~45 min")
+  status    MeetingStatus @default(TENTATIVE)
+  published Boolean       @default(false)
+  rsvpCount Int           @default(0)
+  photoUrl  String?
+  speakerId String?
+  speaker   Speaker?      @relation(fields: [speakerId], references: [id])
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([date])
+  @@index([published])
+}
+
+model Application {
+  id          String            @id @default(cuid())
+  type        ApplicationType
+  payload     Json
+  status      ApplicationStatus @default(NEW)
+  flagged     Boolean           @default(false)
+  submittedAt DateTime          @default(now())
+  reviewedById String?
+  reviewedBy  Officer?          @relation("ReviewedBy", fields: [reviewedById], references: [id])
+  promotedId  String?
+  notes       Note[]
+
+  @@index([type, status])
+  @@index([submittedAt])
+}
+
+model Note {
+  id            String      @id @default(cuid())
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  authorId      String
+  author        Officer     @relation(fields: [authorId], references: [id])
+  body          String
+  createdAt     DateTime    @default(now())
+
+  @@index([applicationId])
+}
+
+model ActivityLog {
+  id         String   @id @default(cuid())
+  actor      String
+  action     String
+  targetType String
+  targetId   String?
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model PageContent {
+  slug      String     @id
+  title     String
+  path      String
+  blocks    Json
+  status    PageStatus @default(DRAFT)
+  updatedAt DateTime   @updatedAt
+  updatedById String?
+  updatedBy Officer?   @relation(fields: [updatedById], references: [id])
+}
+
+model ClubSettings {
+  id               String  @id @default("club")
+  name             String  @default("Chaminade Investment Club")
+  shortName        String  @default("CIC")
+  foundedYear      String  @default("2024")
+  meetingLocation  String  @default("Little Theatre")
+  meetingTime      String  @default("7:45 AM")
+  seasonLabel      String  @default("Spring 2026")
+}
