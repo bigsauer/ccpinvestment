@@ -22,3 +22,5 @@ npm run dev
 Postgres is on **localhost:5436**. Officer email is `SEED_ADMIN_EMAIL` in `.env.local`.
 
 **Vercel:** set `DATABASE_URL`, `AUTH_SECRET`, and `AUTH_URL` before the first deploy. Apply schema with `prisma migrate deploy`, not `db push`. Do not run seed in production.
+
+**IIS (Windows):** IIS does not run TypeScript. On the Windows server run `npm run build:iis`, point the site at `dist/iis`, and add a `.env` beside `server.js`. See `deploy/iis/README.md`.

@@ -13,19 +13,27 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     return <>{children}</>;
   }
 
-  const openApps = await prisma.application.count({
-    where: { status: { in: ["NEW", "REVIEWING"] } },
-  });
+  const [openApps, officer] = await Promise.all([
+    prisma.application.count({
+      where: { status: { in: ["NEW", "REVIEWING"] } },
+    }),
+    prisma.officer.findUnique({
+      where: { id: session.user.officerId },
+      select: { name: true, role: true, classYear: true },
+    }),
+  ]);
+
+  const role = officer?.role ?? session.user.role;
 
   return (
     <AdminShell
       collapsed={collapsed}
       openApps={openApps}
-      writable={canWrite(session.user.role)}
+      writable={canWrite(role)}
       user={{
-        name: session.user.name ?? "Officer",
-        role: roleLabel(session.user.role),
-        classYear: session.user.classYear,
+        name: officer?.name ?? session.user.name ?? "Officer",
+        role: roleLabel(role),
+        classYear: officer?.classYear ?? session.user.classYear,
       }}
     >
       {children}

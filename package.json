@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:iis": "node scripts/build-iis.mjs",
     "start": "next start",
     "lint": "eslint",
     "db:generate": "prisma generate",

@@ -1,5 +1,8 @@
+import NextAuth from "next-auth";
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { authConfig } from "@/lib/auth.config";
+
+const { auth } = NextAuth(authConfig);
 
 export default auth((req) => {
   const path = req.nextUrl.pathname;
@@ -13,12 +16,14 @@ export default auth((req) => {
   }
 
   if (isLogin && req.auth) {
-    return NextResponse.redirect(new URL("/admin", req.nextUrl));
+    const next = req.nextUrl.searchParams.get("callbackUrl") ?? "/admin";
+    const dest = next.startsWith("/admin") && !next.startsWith("//") && !next.includes("://") ? next : "/admin";
+    return NextResponse.redirect(new URL(dest, req.nextUrl));
   }
 
   return NextResponse.next();
 });
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin", "/admin/:path*"],
 };

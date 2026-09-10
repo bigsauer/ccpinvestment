@@ -22,7 +22,11 @@ function asResult(error: unknown): ActionResult {
 async function requireWriter() {
   const session = await auth();
   if (!session?.user?.officerId) throw new Error("Sign in required");
-  if (!canWrite(session.user.role)) throw new Error("Advisor accounts are read-only");
+  const officer = await prisma.officer.findUnique({
+    where: { id: session.user.officerId },
+    select: { role: true },
+  });
+  if (!officer || !canWrite(officer.role)) throw new Error("Advisor accounts are read-only");
   return session.user;
 }
 

@@ -2,12 +2,11 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
 import type { OfficerRole } from "@prisma/client";
+import { authConfig } from "@/lib/auth.config";
 import { prisma } from "@/lib/db";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  trustHost: true,
-  session: { strategy: "jwt" },
-  pages: { signIn: "/admin/login" },
+  ...authConfig,
   providers: [
     Credentials({
       name: "Email",
@@ -39,37 +38,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.officerId = user.officerId;
-        token.role = user.role;
-        token.classYear = user.classYear ?? null;
-        token.name = user.name;
-        token.email = user.email;
-      } else if (typeof token.officerId === "string") {
-        const officer = await prisma.officer.findUnique({
-          where: { id: token.officerId },
-          select: { role: true, classYear: true, name: true, email: true },
-        });
-        if (officer) {
-          token.role = officer.role;
-          token.classYear = officer.classYear;
-          token.name = officer.name;
-          token.email = officer.email;
-        }
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      session.user.officerId = String(token.officerId);
-      session.user.role = token.role as OfficerRole;
-      session.user.classYear = typeof token.classYear === "string" ? token.classYear : null;
-      session.user.name = typeof token.name === "string" ? token.name : session.user.name;
-      session.user.email = typeof token.email === "string" ? token.email : session.user.email;
-      return session;
-    },
-  },
 });
 
 export function canWrite(role: OfficerRole) {

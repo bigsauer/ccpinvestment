@@ -13,7 +13,7 @@ Public site + officer admin CMS for the Chaminade College Preparatory Investment
 | Content | `PageContent` JSON blocks — simple field editor, not a freeform CMS |
 | RSVPs | Officer-entered count on meetings (no public RSVP form) |
 | Email | Stub — confirmations log to `ActivityLog` only |
-| Deploy | Vercel-ready. Do not assume AWS/Cognito for v1. |
+| Deploy | Default: Vercel. Optional: Windows IIS reverse-proxies a Next `standalone` Node process (`npm run build:iis`). Do not assume AWS/Cognito. |
 | Tracking | **Do not create Linear issues for this repo.** Personal/school project, not RP Exotics. |
 
 ## Non-goals (v1)
@@ -45,6 +45,10 @@ Set these before the first deploy. The app throws on boot if any required value 
 | `SEED_ADMIN_*` | no | Do **not** set or run seed in production |
 
 Apply schema with `npx prisma migrate deploy` (CI or one-off), not `db push`.
+
+## Production (IIS / Windows)
+
+IIS cannot execute TypeScript. Build on the **Windows** box (`npm run build:iis`) so Prisma engines match the OS, point the IIS site at `dist/iis`, and put `DATABASE_URL`, `AUTH_SECRET`, and `AUTH_URL` in a `.env` next to `server.js`. Details: `deploy/iis/README.md`.
 
 ## Site content blocks
 
