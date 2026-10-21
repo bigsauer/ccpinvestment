@@ -1519,3 +1519,6 @@ button.gi-door { width: 100%; text-align: left; background: transparent; border:
 /* Hero ghost button: a later generic .btn.ghost rule made it dark-on-dark */
 .hero-content .btn.ghost { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.32); color: #fff; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
 .hero-content .btn.ghost:hover { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.5); color: #fff; }
+
+/* "A few asks" is now the first block in the speaker column; line it up with the form */
+.speak-wrap .speak-asks:first-child { margin-top: 0; }

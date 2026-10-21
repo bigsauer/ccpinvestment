@@ -89,58 +89,6 @@ export function GetInvolved() {
           ) : (
             <div className="speak-wrap">
               <div>
-                <div className="speak-eyebrow">What it looks like</div>
-                <h2 className="speak-headline">
-                  A real meeting, <span className="serif">not a lecture.</span>
-                </h2>
-                <p className="speak-intro">
-                  A short opening — what you do, how you got there — then 25 minutes of student questions the officers
-                  prepare in advance. Bring slides if you want, or don&apos;t. Most of our best sessions had none.
-                </p>
-                <div className="speak-spec">
-                  <div className="speak-spec-row">
-                    <div className="k">Format</div>
-                    <div className="v">
-                      10 min opening · 25 min Q&amp;A · 5 min handshake
-                      <span className="qual">In-person preferred. Virtual fine for out-of-region speakers.</span>
-                    </div>
-                  </div>
-                  <div className="speak-spec-row">
-                    <div className="k">Audience</div>
-                    <div className="v">
-                      ~40–60 students, grades 9–12
-                      <span className="qual">Most are members; we open select sessions to other clubs.</span>
-                    </div>
-                  </div>
-                  <div className="speak-spec-row">
-                    <div className="k">When</div>
-                    <div className="v">
-                      Fridays, 7:45–8:30 AM
-                      <span className="qual">Before first period. Coffee provided.</span>
-                    </div>
-                  </div>
-                  <div className="speak-spec-row">
-                    <div className="k">Where</div>
-                    <div className="v">
-                      Little Theatre — 425 S Lindbergh Blvd, Creve Coeur MO
-                      <span className="qual">Parking pass and visitor badge handled by the front office.</span>
-                    </div>
-                  </div>
-                  <div className="speak-spec-row">
-                    <div className="k">Stipend</div>
-                    <div className="v">
-                      None — we&apos;re a student club
-                      <span className="qual">We will, however, feed you breakfast and write a thoughtful thank-you.</span>
-                    </div>
-                  </div>
-                  <div className="speak-spec-row" style={{ borderBottom: "none" }}>
-                    <div className="k">Recording</div>
-                    <div className="v">
-                      Off by default
-                      <span className="qual">If you&apos;d like a recording for your own use, we&apos;ll arrange it.</span>
-                    </div>
-                  </div>
-                </div>
                 <div className="speak-asks">
                   <div className="h">A few asks</div>
                   <ul>
