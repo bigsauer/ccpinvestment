@@ -1522,3 +1522,6 @@ button.gi-door { width: 100%; text-align: left; background: transparent; border:
 
 /* "A few asks" is now the first block in the speaker column; line it up with the form */
 .speak-wrap .speak-asks:first-child { margin-top: 0; }
+
+/* Speaker tab is just the application form now: keep it centered, not stuck in the left column */
+.speak-wrap.speak-solo { grid-template-columns: 1fr; max-width: 760px; margin: 0 auto; }

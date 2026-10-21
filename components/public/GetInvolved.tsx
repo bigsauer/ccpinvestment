@@ -87,18 +87,7 @@ export function GetInvolved() {
               <JoinForm />
             </div>
           ) : (
-            <div className="speak-wrap">
-              <div>
-                <div className="speak-asks">
-                  <div className="h">A few asks</div>
-                  <ul>
-                    <li>Be specific. &quot;What I did Tuesday&quot; beats &quot;What is finance.&quot;</li>
-                    <li>Honest about pay, hours, and wrong turns. Students notice when you&apos;re not.</li>
-                    <li>No pitching products, funds, or services to minors.</li>
-                    <li>Background check is required — the school handles it; takes about a week.</li>
-                  </ul>
-                </div>
-              </div>
+            <div className="speak-wrap speak-solo">
               <SpeakForm />
             </div>
           )}
