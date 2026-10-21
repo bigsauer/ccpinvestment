@@ -7,6 +7,7 @@
     "build": "next build",
     "build:iis": "node scripts/build-iis.mjs",
     "start": "next start",
+    "postinstall": "prisma generate",
     "lint": "eslint",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
@@ -20,7 +21,7 @@
   "dependencies": {
     "@prisma/client": "^6.16.1",
     "bcryptjs": "^3.0.2",
-    "next": "15.5.4",
+    "next": "^15.5.28",
     "next-auth": "5.0.0-beta.29",
     "react": "19.1.0",
     "react-dom": "19.1.0"
@@ -33,7 +34,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "15.5.4",
+    "eslint-config-next": "^15.5.28",
     "prisma": "^6.16.1",
     "tailwindcss": "^4",
     "tsx": "^4.20.5",
