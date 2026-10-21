@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export function PublicFooter() {
@@ -5,7 +6,7 @@ export function PublicFooter() {
     <footer>
       <div className="wrap foot-row">
         <div className="brand">
-          <span className="brand-mark cic-mark">CIC</span>
+          <Image className="brand-mark" src="/brand/club-badge.png" alt="Chaminade Investment Club" width={38} height={38} />
           <div className="brand-name">Chaminade Investment Club</div>
         </div>
         <div className="foot-links">

@@ -1,8 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const LINKS = [
   { href: "/", label: "Home" },
@@ -16,11 +17,38 @@ export function PublicNav({ showNextMeeting = false }: { showNextMeeting?: boole
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
+  // Close whenever the route changes.
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
+  // While open: Escape closes, and the page behind doesn't scroll.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = previous;
+    };
+  }, [open]);
+
   return (
     <nav className="nav">
       <div className="wrap nav-row">
         <Link href="/" className="brand">
-          <span className="brand-mark cic-mark">CIC</span>
+          <Image
+            className="brand-mark"
+            src="/brand/club-badge.png"
+            alt="Chaminade Investment Club"
+            width={38}
+            height={38}
+            priority
+          />
           <div className="brand-name">
             Chaminade Investment Club <span className="muted">— est. 2024</span>
           </div>
@@ -38,7 +66,7 @@ export function PublicNav({ showNextMeeting = false }: { showNextMeeting?: boole
         </div>
         <div className="nav-cta">
           {showNextMeeting ? (
-            <Link className="btn" href="/meetings">
+            <Link className="btn nav-next" href="/meetings">
               Next meeting
             </Link>
           ) : null}
@@ -47,28 +75,66 @@ export function PublicNav({ showNextMeeting = false }: { showNextMeeting?: boole
           </Link>
           <button
             type="button"
-            className="btn mobile-nav-toggle"
-            aria-label="Open menu"
+            className={open ? "nav-burger is-open" : "nav-burger"}
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            aria-controls="mobile-nav"
             onClick={() => setOpen((v) => !v)}
           >
-            Menu
+            <span className="bars" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+            </span>
           </button>
         </div>
       </div>
-      {open ? (
-        <div className="mobile-nav-drawer wrap">
-          {LINKS.map((link) => (
+
+      <div id="mobile-nav" className={open ? "mobile-nav open" : "mobile-nav"}>
+        <button
+          type="button"
+          className="mobile-nav-backdrop"
+          aria-label="Close menu"
+          tabIndex={open ? 0 : -1}
+          onClick={() => setOpen(false)}
+        />
+        <div className="mobile-nav-panel">
+          <ul className="mobile-nav-links">
+            {LINKS.map((link) => {
+              const active = pathname === link.href;
+              return (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className={active ? "on" : undefined}
+                    aria-current={active ? "page" : undefined}
+                    tabIndex={open ? 0 : -1}
+                    onClick={() => setOpen(false)}
+                  >
+                    <span className="lbl">
+                      {active ? <i className="dot" /> : null}
+                      {link.label}
+                    </span>
+                    <span className="chev" aria-hidden="true">
+                      →
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+          <div className="mobile-nav-cta">
             <Link
-              key={link.href}
-              href={link.href}
-              className={pathname === link.href ? "on" : undefined}
+              className="btn red"
+              href="/get-involved?tab=students"
+              tabIndex={open ? 0 : -1}
               onClick={() => setOpen(false)}
             >
-              {link.label}
+              Apply to join <span className="arrow">→</span>
             </Link>
-          ))}
+          </div>
         </div>
-      ) : null}
+      </div>
     </nav>
   );
 }

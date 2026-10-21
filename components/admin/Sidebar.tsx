@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logout } from "@/lib/actions/auth";
@@ -115,7 +116,7 @@ export function Sidebar({
       <aside className={`side${mobileOpen ? " mobile-open" : ""}`}>
         <div className="side-head">
           <div className="side-brand">
-            <div className="side-mark">CIC</div>
+            <Image className="side-mark" src="/brand/club-badge.png" alt="Chaminade Investment Club" width={30} height={30} />
             <div className="nm">
               CCP Investment Club <span className="mut">— admin</span>
             </div>

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { CountUp } from "@/components/public/CountUp";
 import { PublicNav } from "@/components/public/Nav";
 import { pageText } from "@/lib/copy";
 import { getClubSettings, getLivePageBlocks, getNextMeeting } from "@/lib/queries";
@@ -103,22 +104,30 @@ export default async function HomePage() {
         <div className="wrap stats-inner">
           <div className="stat">
             <div className="k">Members</div>
-            <div className="v mono">60+</div>
+            <div className="v mono">
+              <CountUp value="60+" />
+            </div>
             <div className="d">Across all grades</div>
           </div>
           <div className="stat">
             <div className="k">Guest speakers</div>
-            <div className="v mono">12</div>
+            <div className="v mono">
+              <CountUp value="12+" delay={140} />
+            </div>
             <div className="d">Since founding</div>
           </div>
           <div className="stat">
-            <div className="k">Sessions hosted</div>
-            <div className="v mono">24</div>
+            <div className="k">Sessions held</div>
+            <div className="v mono">
+              <CountUp value="24+" delay={280} />
+            </div>
             <div className="d">2024 → present</div>
           </div>
           <div className="stat">
             <div className="k">Estab.</div>
-            <div className="v">{settings.foundedYear}</div>
+            <div className="v">
+              <CountUp value={settings.foundedYear} from={2000} delay={420} />
+            </div>
             <div className="d">Fully student-run</div>
           </div>
         </div>

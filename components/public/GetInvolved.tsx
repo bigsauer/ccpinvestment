@@ -81,76 +81,8 @@ export function GetInvolved() {
                 <p className="gi-club-intro">
                   You don&apos;t need to know what an EBITDA is. You don&apos;t need to own a stock. You don&apos;t need
                   to want a finance career. What you need is curiosity about how money, decisions, and careers actually
-                  work in the wild — and a willingness to show up at 7:45 AM.
+                  work in the wild — and a willingness to show up at 6:45 AM.
                 </p>
-                <div
-                  className="gi-rhythm-h"
-                  style={{
-                    fontFamily: "var(--font-geist-mono)",
-                    fontSize: 10.5,
-                    color: "var(--ink-4)",
-                    letterSpacing: "0.14em",
-                    textTransform: "uppercase",
-                    margin: "24px 0 4px",
-                  }}
-                >
-                  A typical meeting
-                </div>
-                <div className="gi-rhythm">
-                  <div className="min">7:45</div>
-                  <div className="what">
-                    Coffee, donuts, members filter in
-                    <span className="qual">Officers introduce that day&apos;s speaker to anyone who hasn&apos;t met them.</span>
-                  </div>
-                </div>
-                <div className="gi-rhythm">
-                  <div className="min">7:50</div>
-                  <div className="what">
-                    Speaker opens — 10 minutes
-                    <span className="qual">Their path, their firm, what they actually do on a Tuesday.</span>
-                  </div>
-                </div>
-                <div className="gi-rhythm">
-                  <div className="min">8:00</div>
-                  <div className="what">
-                    Q&amp;A — 25 minutes
-                    <span className="qual">Officer-curated questions first, then open floor. This is the part that matters.</span>
-                  </div>
-                </div>
-                <div className="gi-rhythm">
-                  <div className="min">8:25</div>
-                  <div className="what">
-                    Handshakes &amp; contact swap
-                    <span className="qual">Five minutes to introduce yourself before first period.</span>
-                  </div>
-                </div>
-                <div className="gi-quickfacts">
-                  <div className="h">The basics</div>
-                  <div className="row">
-                    <div className="k">When</div>
-                    <div className="v">Every other Friday, 7:45–8:30 AM</div>
-                  </div>
-                  <div className="row">
-                    <div className="k">Where</div>
-                    <div className="v">Little Theatre, Chaminade campus</div>
-                  </div>
-                  <div className="row">
-                    <div className="k">Who</div>
-                    <div className="v">All grades, ~40–60 members</div>
-                  </div>
-                  <div className="row">
-                    <div className="k">Cost</div>
-                    <div className="v">Free — no dues, no fees</div>
-                  </div>
-                  <div className="row">
-                    <div className="k">Prereq</div>
-                    <div className="v">None. Curiosity only.</div>
-                  </div>
-                  <div className="row">
-                    <div className="k">Commitment</div>
-                    <div className="v">Show up when you can; missing weeks is fine</div>
-                  </div>
-                </div>
               </div>
               <JoinForm />
             </div>
