@@ -33,10 +33,11 @@ export function JoinForm() {
           <label htmlFor="grade">Class of</label>
           <select id="grade" name="grade" required disabled={state.ok} defaultValue="">
             <option value="">Select —</option>
-            <option>2026</option>
             <option>2027</option>
             <option>2028</option>
             <option>2029</option>
+            <option>2030</option>
+            <option>2031</option>
           </select>
         </div>
         <div className="field">
