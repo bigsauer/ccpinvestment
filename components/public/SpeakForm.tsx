@@ -16,20 +16,25 @@ const TOPICS = [
 
 const FORMATS = ["In-person", "Virtual", "Either"] as const;
 
-const DATES = [
-  { value: "2026-09-11", mo: "Sep", day: "11", dow: "Friday" },
-  { value: "2026-09-25", mo: "Sep", day: "25", dow: "Friday" },
-  { value: "2026-10-09", mo: "Oct", day: "09", dow: "Friday" },
-  { value: "2026-10-23", mo: "Oct", day: "23", dow: "Friday" },
-  { value: "2026-11-06", mo: "Nov", day: "06", dow: "Friday" },
-  { value: "2026-11-20", mo: "Nov", day: "20", dow: "Friday" },
-  { value: "flexible", mo: "Open", day: "—", dow: "I'm flexible" },
-];
+/** "2026-11-06" -> "Fri, Nov 6, 2026" (parsed as a local date so the day never shifts). */
+function prettyDate(value: string) {
+  const [y, m, d] = value.split("-").map(Number);
+  return new Intl.DateTimeFormat("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" }).format(
+    new Date(y, m - 1, d),
+  );
+}
 
+function todayISO() {
+  const now = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}
 export function SpeakForm() {
   const [topics, setTopics] = useState<string[]>([]);
   const [format, setFormat] = useState<(typeof FORMATS)[number]>("In-person");
   const [dates, setDates] = useState<string[]>([]);
+  const [pendingDate, setPendingDate] = useState("");
+  const [flexible, setFlexible] = useState(false);
   const [state, action, pending] = useActionState(
     submitSpeakerApplication,
     { ok: false } satisfies FormState,
@@ -215,31 +220,60 @@ export function SpeakForm() {
           <input type="hidden" name="format" value={format} />
         </div>
         <div className="field">
-          <label>
-            Suggested dates <span style={{ color: "var(--ink-4)" }}>(pick any that work — we&apos;ll confirm one)</span>
+          <label htmlFor="spk-date">
+            Dates that work for you <span style={{ color: "var(--ink-4)" }}>(pick any — we&apos;ll confirm one)</span>
           </label>
-          <div className="date-pills">
-            {DATES.map((date) => (
-              <button
-                key={date.value}
-                type="button"
-                className={dates.includes(date.value) ? "date-pill on" : "date-pill"}
-                disabled={state.ok}
-                onClick={() =>
-                  setDates((current) =>
-                    current.includes(date.value)
-                      ? current.filter((item) => item !== date.value)
-                      : [...current, date.value],
-                  )
-                }
-              >
-                <div className="mo">{date.mo}</div>
-                <div className="day">{date.day}</div>
-                <div className="dow">{date.dow}</div>
-              </button>
-            ))}
+          <div className="date-add">
+            <input
+              id="spk-date"
+              type="date"
+              value={pendingDate}
+              min={todayISO()}
+              disabled={state.ok}
+              onChange={(e) => setPendingDate(e.target.value)}
+            />
+            <button
+              type="button"
+              className="btn"
+              disabled={state.ok || !pendingDate || dates.includes(pendingDate)}
+              onClick={() => {
+                setDates((current) => [...current, pendingDate].sort());
+                setPendingDate("");
+              }}
+            >
+              Add date
+            </button>
+            <button
+              type="button"
+              className={flexible ? "topic-chip on" : "topic-chip"}
+              disabled={state.ok}
+              aria-pressed={flexible}
+              onClick={() => setFlexible((v) => !v)}
+            >
+              I&apos;m flexible
+            </button>
           </div>
-          <input type="hidden" name="dates" value={dates.join(", ")} />
+          {dates.length > 0 ? (
+            <div className="date-pills">
+              {dates.map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  className="date-chip"
+                  disabled={state.ok}
+                  aria-label={`Remove ${prettyDate(value)}`}
+                  onClick={() => setDates((current) => current.filter((item) => item !== value))}
+                >
+                  {prettyDate(value)} <span aria-hidden="true">×</span>
+                </button>
+              ))}
+            </div>
+          ) : null}
+          <input
+            type="hidden"
+            name="dates"
+            value={[...dates.map(prettyDate), ...(flexible ? ["Flexible"] : [])].join(", ")}
+          />
         </div>
         <div className="field">
           <label htmlFor="spk-notes">

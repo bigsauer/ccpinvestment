@@ -729,6 +729,11 @@ h1.display .red { color: var(--red); }
   margin-top: 6px;
 }
 .date-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+.date-add { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.date-add input[type="date"] { width: auto; min-width: 190px; }
+.date-chip { display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; padding: 8px 12px; border: 1px solid var(--red); background: var(--red-soft); border-radius: 999px; font: inherit; font-size: 13.5px; color: var(--ink); cursor: pointer; }
+.date-chip:hover { background: #fff; }
+.date-chip span { color: var(--red); font-size: 16px; line-height: 1; }
 .date-pill {
   border: 1px solid var(--line-2); background: var(--bg-2);
   border-radius: 10px; padding: 10px 14px;
