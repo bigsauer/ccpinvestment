@@ -4,8 +4,14 @@ import { GetInvolved } from "@/components/public/GetInvolved";
 import { PageBannerCopy } from "@/components/public/PageBannerCopy";
 import { PublicNav } from "@/components/public/Nav";
 import { getLivePageBlocks } from "@/lib/queries";
+import { pageMeta } from "@/lib/site";
 
-export const metadata: Metadata = { title: "Get involved" };
+export const metadata: Metadata = pageMeta({
+  title: "Join the Club or Speak to Students",
+  description:
+    "Chaminade students can apply to join the investment club, and working professionals can apply to speak. Free to join, no experience needed. St. Louis.",
+  path: "/get-involved",
+});
 
 export default async function GetInvolvedPage() {
   const blocks = await getLivePageBlocks("get-involved");

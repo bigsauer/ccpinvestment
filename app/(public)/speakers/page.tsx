@@ -3,9 +3,16 @@ import Image from "next/image";
 import { PublicNav } from "@/components/public/Nav";
 import { PageBannerCopy } from "@/components/public/PageBannerCopy";
 import { SpeakerArchive } from "@/components/public/SpeakerFilters";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { getLivePageBlocks, getSpeakers } from "@/lib/queries";
+import { SITE, absoluteUrl, pageMeta, speakerSlug } from "@/lib/site";
 
-export const metadata: Metadata = { title: "Speakers" };
+export const metadata: Metadata = pageMeta({
+  title: "Guest Speakers: Past & Upcoming",
+  description:
+    "Meet the working professionals who have spoken to Chaminade Investment Club students: executives, founders, and investors, plus who is coming up next.",
+  path: "/speakers",
+});
 export const revalidate = 60;
 
 export default async function SpeakersPage() {
@@ -13,6 +20,23 @@ export default async function SpeakersPage() {
 
   return (
     <>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: `Guest speakers | ${SITE.name}`,
+          url: absoluteUrl("/speakers"),
+          mainEntity: {
+            "@type": "ItemList",
+            itemListElement: speakers.map((s, i) => ({
+              "@type": "ListItem",
+              position: i + 1,
+              url: absoluteUrl(`/speakers/${speakerSlug(s.firstName, s.lastName)}`),
+              name: `${s.firstName} ${s.lastName}`,
+            })),
+          },
+        }}
+      />
       <PublicNav />
       <header className="page-banner">
         <Image className="pb-img" src="/photos/session-05.jpg" alt="Chaminade Investment Club meeting" fill priority sizes="100vw" />

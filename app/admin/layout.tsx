@@ -1,8 +1,12 @@
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { auth, canWrite } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { roleLabel } from "@/lib/utils";
+
+// Officer tools: never index, never follow.
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();

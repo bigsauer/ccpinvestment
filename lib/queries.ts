@@ -1,6 +1,7 @@
 import { asStringBlocks } from "@/lib/copy";
 import { prisma } from "@/lib/db";
 import { safeHttpUrl } from "@/lib/safe-url";
+import { speakerSlug } from "@/lib/site";
 
 export async function getLivePageBlocks(slug: string) {
   const page = await prisma.pageContent.findUnique({ where: { slug } });
@@ -102,4 +103,16 @@ export async function getDashboardStats() {
     nextMeeting,
     recentActivity,
   };
+}
+
+export async function getSpeakerBySlug(slug: string) {
+  const speakers = await getSpeakers();
+  return speakers.find((s) => speakerSlug(s.firstName, s.lastName) === slug) ?? null;
+}
+
+export async function getMeetingForSpeaker(speakerId: string) {
+  return prisma.meeting.findFirst({
+    where: { speakerId, published: true },
+    orderBy: { date: "desc" },
+  });
 }

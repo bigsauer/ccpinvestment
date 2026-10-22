@@ -4,9 +4,15 @@ import Link from "next/link";
 import { PublicNav } from "@/components/public/Nav";
 import { PageBannerCopy } from "@/components/public/PageBannerCopy";
 import { getLivePageBlocks, getPublicOfficers } from "@/lib/queries";
+import { pageMeta } from "@/lib/site";
 import { initials, roleLabel } from "@/lib/utils";
 
-export const metadata: Metadata = { title: "Team" };
+export const metadata: Metadata = pageMeta({
+  title: "Student Officers & Faculty Advisor",
+  description:
+    "Meet the student officers who run the Chaminade Investment Club, and the faculty advisor who supports them, at Chaminade College Preparatory School in St. Louis.",
+  path: "/team",
+});
 export const revalidate = 60;
 
 export default async function TeamPage() {

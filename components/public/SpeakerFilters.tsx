@@ -2,25 +2,10 @@
 
 import Image from "next/image";
 import { useCallback, useMemo, useState, type CSSProperties } from "react";
-import { SpeakerProfile, localPhoto, tagLabel } from "@/components/public/SpeakerProfile";
+import { SpeakerProfile } from "@/components/public/SpeakerProfile";
 import { safeHttpUrl } from "@/lib/safe-url";
+import { localPhoto, tagLabel, type PublicSpeaker } from "@/lib/speakers";
 import { linkedinHandle } from "@/lib/utils";
-
-export type PublicSpeaker = {
-  id: string;
-  firstName: string;
-  lastName: string;
-  firm: string;
-  title: string;
-  topic: string;
-  bio?: string;
-  industry?: string | null;
-  season: string | null;
-  status: "UPCOMING" | "PAST";
-  sessionDate: string | null;
-  photoUrl?: string | null;
-  linkedinUrl: string | null;
-};
 
 export function SpeakerArchive({ speakers }: { speakers: PublicSpeaker[] }) {
   const [filter, setFilter] = useState<"all" | "upcoming" | "past">("all");

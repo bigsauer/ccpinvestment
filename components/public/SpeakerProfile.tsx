@@ -1,29 +1,16 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
-import type { PublicSpeaker } from "@/components/public/SpeakerFilters";
 import { safeHttpUrl } from "@/lib/safe-url";
+import { localPhoto, tagLabel, type PublicSpeaker } from "@/lib/speakers";
+import { speakerSlug } from "@/lib/site";
 import { linkedinHandle } from "@/lib/utils";
 
 const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 const EXIT_MS = 200;
-
-/** Local images only (served from /public); anything else falls back to initials. */
-export function localPhoto(url?: string | null) {
-  return url && url.startsWith("/") && !url.startsWith("//") ? url : null;
-}
-
-export function tagLabel(speaker: PublicSpeaker) {
-  if (!speaker.sessionDate) return speaker.status === "UPCOMING" ? "Upcoming" : "Past";
-  const label = new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "2-digit",
-    timeZone: "America/Chicago",
-  }).format(new Date(speaker.sessionDate));
-  return speaker.status === "UPCOMING" ? `Upcoming · ${label}` : `Past · ${label}`;
-}
 
 function longDate(speaker: PublicSpeaker) {
   if (!speaker.sessionDate) return speaker.season ?? "Date to be announced";
@@ -186,8 +173,12 @@ export function SpeakerProfile({ speakers, activeId, onSelect, onClose }: Props)
             </a>
           ) : null}
 
+          <Link className="spm-full" href={`/speakers/${speakerSlug(speaker.firstName, speaker.lastName)}`} style={step(7)}>
+            Open full page <span aria-hidden="true">→</span>
+          </Link>
+
           {speakers.length > 1 ? (
-            <div className="spm-nav" style={step(7)}>
+            <div className="spm-nav" style={step(8)}>
               <button type="button" onClick={() => go(-1)} aria-label="Previous speaker">
                 <span aria-hidden="true">←</span> Prev
               </button>
