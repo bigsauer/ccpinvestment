@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { CountUp } from "@/components/public/CountUp";
 import { Countdown } from "@/components/public/Countdown";
 import { PublicNav } from "@/components/public/Nav";
 import { PageBannerCopy } from "@/components/public/PageBannerCopy";
@@ -173,7 +174,9 @@ export default async function MeetingsPage() {
                       <div className="mo">
                         {monthName(next.date)} · {next.date.getFullYear()}
                       </div>
-                      <div className="day">{dayNumber(next.date)}</div>
+                      <div className="day">
+                        <CountUp value={dayNumber(next.date)} pad={2} duration={1200} />
+                      </div>
                       <div className="yr">{weekdayName(next.date)}</div>
                     </div>
                     <Countdown target={next.date.toISOString()} />

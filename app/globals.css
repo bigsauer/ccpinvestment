@@ -1703,7 +1703,7 @@ button.gi-door { width: 100%; text-align: left; background: transparent; border:
 
 /* Student session: a deliberately different, darker card */
 .up-card.is-student { background: #0f0f10; border-color: #0f0f10; color: #fff; }
-.up-card.is-student::before, .hero-meeting.student::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(520px 220px at 88% -8%, rgba(196,30,40,0.42), transparent 70%), repeating-linear-gradient(0deg, rgba(255,255,255,0.045) 0 1px, transparent 1px 30px); }
+.up-card.is-student::before, .hero-meeting.student::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(520px 220px at 88% -8%, rgba(196,30,40,0.42), transparent 70%); }
 .up-card.is-student .up-date { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
 .up-card.is-student .up-date .mo { color: #ff8088; }
 .up-card.is-student .up-date .wd { color: rgba(255,255,255,0.55); }

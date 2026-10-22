@@ -8,6 +8,8 @@ type Props = {
   /** Where the count starts. Use e.g. 2000 for a year so it doesn't spin up from 0. */
   from?: number;
   duration?: number;
+  /** Minimum digits, zero-padded (e.g. 2 for a day-of-month like "04"). */
+  pad?: number;
   /** Stagger start (ms) after the element scrolls into view. */
   delay?: number;
   className?: string;
@@ -15,7 +17,7 @@ type Props = {
 
 const NUMBER = /^(\D*)(\d[\d,]*)(.*)$/;
 
-export function CountUp({ value, from = 0, duration = 1700, delay = 0, className }: Props) {
+export function CountUp({ value, from = 0, duration = 1700, delay = 0, pad = 0, className }: Props) {
   const text = String(value);
   const match = NUMBER.exec(text);
   const prefix = match?.[1] ?? "";
@@ -67,7 +69,8 @@ export function CountUp({ value, from = 0, duration = 1700, delay = 0, className
   }, [text, from, duration, delay]);
 
   const shown = current ?? target;
-  const display = match ? `${prefix}${grouped ? shown.toLocaleString("en-US") : shown}${suffix}` : text;
+  const digits = grouped ? shown.toLocaleString("en-US") : String(shown).padStart(pad, "0");
+  const display = match ? `${prefix}${digits}${suffix}` : text;
 
   return (
     <span ref={ref} className={className}>

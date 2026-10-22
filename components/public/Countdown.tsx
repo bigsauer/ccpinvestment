@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+const COUNT_MS = 1500;
+
 function partsUntil(target: Date) {
   const ms = Math.max(0, target.getTime() - Date.now());
   const days = Math.floor(ms / 86400000);
@@ -14,10 +16,13 @@ type Parts = ReturnType<typeof partsUntil>;
 
 /**
  * The clock depends on "now", so the server HTML can never match the browser.
- * Render placeholders on the server and the first client render, then fill in after mount.
+ * Render placeholders on the server and the first client render, then fill in after mount,
+ * counting up from zero once so the numbers land with a bit of motion.
  */
 export function Countdown({ target }: { target: string }) {
   const [parts, setParts] = useState<Parts | null>(null);
+  // 0..1 while the intro count-up runs; 1 once it has landed (or when motion is reduced).
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     const next = new Date(target);
@@ -27,7 +32,24 @@ export function Countdown({ target }: { target: string }) {
     return () => window.clearInterval(id);
   }, [target]);
 
-  const show = (n: number | undefined) => (n === undefined ? "--" : String(n).padStart(2, "0"));
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setProgress(1);
+      return;
+    }
+    let raf = 0;
+    const start = performance.now();
+    const frame = (now: number) => {
+      const t = Math.min(1, (now - start) / COUNT_MS);
+      setProgress(t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
+      if (t < 1) raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  const show = (n: number | undefined) =>
+    n === undefined ? "--" : String(Math.round(n * progress)).padStart(2, "0");
 
   return (
     <div className="cd" role="timer" aria-label="Time until the next session">
