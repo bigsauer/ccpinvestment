@@ -548,7 +548,7 @@ h1.display .red { color: var(--red); }
 .past-sessions { display: grid; grid-template-columns: 1.3fr 1fr 1fr; grid-template-rows: 280px 280px; gap: 16px; }
 .past-card { position: relative; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: #000; cursor: pointer; }
 .past-card:first-child { grid-row: span 2; }
-.past-card img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
+.past-card img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 0%; transition: transform .4s ease; }
 .past-card:hover img { transform: scale(1.03); }
 .past-card .past-overlay {
   position: absolute; inset: 0;
