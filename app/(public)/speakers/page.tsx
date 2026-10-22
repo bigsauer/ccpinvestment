@@ -6,6 +6,7 @@ import { SpeakerArchive } from "@/components/public/SpeakerFilters";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getLivePageBlocks, getSpeakers } from "@/lib/queries";
 import { SITE, absoluteUrl, pageMeta, speakerSlug } from "@/lib/site";
+import { parseHighlights } from "@/lib/speakers";
 
 export const metadata: Metadata = pageMeta({
   title: "Guest Speakers: Past & Upcoming",
@@ -70,6 +71,7 @@ export default async function SpeakersPage() {
               photoUrl: speaker.photoUrl,
               bio: speaker.bio,
               industry: speaker.industry,
+              highlights: parseHighlights(speaker.highlights),
             }))}
           />
         </div>

@@ -3,7 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PublicNav } from "@/components/public/Nav";
-import { localPhoto, tagLabel } from "@/lib/speakers";
+import { localPhoto, parseHighlights, tagLabel } from "@/lib/speakers";
+import { SpeakerStory } from "@/components/public/SpeakerStory";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getMeetingForSpeaker, getSpeakerBySlug, getSpeakers } from "@/lib/queries";
 import { safeHttpUrl } from "@/lib/safe-url";
@@ -57,6 +58,7 @@ export default async function SpeakerPage({ params }: { params: Promise<Params> 
   const meeting = await getMeetingForSpeaker(speaker.id);
   const name = `${speaker.firstName} ${speaker.lastName}`;
   const photo = localPhoto(speaker.photoUrl);
+  const highlights = parseHighlights(speaker.highlights);
   const linkedin = safeHttpUrl(speaker.linkedinUrl);
   const upcoming = speaker.status === "UPCOMING";
   const role = roleOf(speaker);
@@ -212,6 +214,14 @@ export default async function SpeakerPage({ params }: { params: Promise<Params> 
               </div>
             </div>
           </article>
+
+          {highlights ? (
+            <section className="sp-story" id="story" aria-labelledby="story-title">
+              <h2 id="story-title">Career story</h2>
+              <p>The path that got {speaker.firstName} to the front of the room.</p>
+              <SpeakerStory highlights={highlights} firstName={speaker.firstName} />
+            </section>
+          ) : null}
         </div>
       </main>
     </>

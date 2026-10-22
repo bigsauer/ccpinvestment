@@ -10,6 +10,11 @@ import { linkedinHandle } from "@/lib/utils";
 export function SpeakerArchive({ speakers }: { speakers: PublicSpeaker[] }) {
   const [filter, setFilter] = useState<"all" | "upcoming" | "past">("all");
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [startView, setStartView] = useState<"overview" | "story">("overview");
+  const openProfile = (id: string, view: "overview" | "story" = "overview") => {
+    setStartView(view);
+    setActiveId(id);
+  };
   const closeProfile = useCallback(() => setActiveId(null), []);
 
   const visible = useMemo(
@@ -46,7 +51,7 @@ export function SpeakerArchive({ speakers }: { speakers: PublicSpeaker[] }) {
               className="spkr"
               data-type={speaker.status.toLowerCase()}
               style={{ "--i": i % 9 } as CSSProperties}
-              onClick={() => setActiveId(speaker.id)}
+              onClick={() => openProfile(speaker.id)}
             >
               <div className="spkr-photo">
                 {photo ? (
@@ -89,11 +94,24 @@ export function SpeakerArchive({ speakers }: { speakers: PublicSpeaker[] }) {
                   aria-label={`View profile: ${speaker.firstName} ${speaker.lastName}`}
                   onClick={(e) => {
                     e.stopPropagation();
-                    setActiveId(speaker.id);
+                    openProfile(speaker.id);
                   }}
                 >
                   View profile <span className="ar">→</span>
                 </button>
+                {speaker.highlights ? (
+                  <button
+                    type="button"
+                    className="spkr-story-chip"
+                    aria-haspopup="dialog"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openProfile(speaker.id, "story");
+                    }}
+                  >
+                    <span aria-hidden="true">✦</span> Career story
+                  </button>
+                ) : null}
               </div>
             </article>
           );
@@ -108,7 +126,13 @@ export function SpeakerArchive({ speakers }: { speakers: PublicSpeaker[] }) {
       ) : null}
 
       {activeId ? (
-        <SpeakerProfile speakers={visible} activeId={activeId} onSelect={setActiveId} onClose={closeProfile} />
+        <SpeakerProfile
+          speakers={visible}
+          activeId={activeId}
+          onSelect={setActiveId}
+          onClose={closeProfile}
+          startView={startView}
+        />
       ) : null}
     </>
   );

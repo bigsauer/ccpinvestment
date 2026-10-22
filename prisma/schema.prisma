@@ -95,6 +95,8 @@ model Speaker {
   status      SpeakerStatus @default(UPCOMING)
   sessionDate DateTime?
   season      String?
+  /// Optional career story: { timeline: [{ when, title, org, detail }], pillars: [{ title, text }] }
+  highlights  Json?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   meetings    Meeting[]

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
+import { SpeakerStory } from "@/components/public/SpeakerStory";
 import { safeHttpUrl } from "@/lib/safe-url";
 import { localPhoto, tagLabel, type PublicSpeaker } from "@/lib/speakers";
 import { speakerSlug } from "@/lib/site";
@@ -31,14 +32,17 @@ type Props = {
   activeId: string;
   onSelect: (id: string) => void;
   onClose: () => void;
+  /** Open straight on the animated career story (when the speaker has one). */
+  startView?: "overview" | "story";
 };
 
-export function SpeakerProfile({ speakers, activeId, onSelect, onClose }: Props) {
+export function SpeakerProfile({ speakers, activeId, onSelect, onClose, startView = "overview" }: Props) {
   const index = Math.max(0, speakers.findIndex((s) => s.id === activeId));
   const speaker = speakers[index];
 
   const [closing, setClosing] = useState(false);
   const [dir, setDir] = useState<"next" | "prev" | "none">("none");
+  const [view, setView] = useState<"overview" | "story">(startView);
   const panelRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const closeTimer = useRef(0);
@@ -54,6 +58,7 @@ export function SpeakerProfile({ speakers, activeId, onSelect, onClose }: Props)
     (delta: 1 | -1) => {
       if (speakers.length < 2) return;
       setDir(delta === 1 ? "next" : "prev");
+      setView("overview");
       onSelect(speakers[(index + delta + speakers.length) % speakers.length].id);
     },
     [index, onSelect, speakers],
@@ -142,28 +147,45 @@ export function SpeakerProfile({ speakers, activeId, onSelect, onClose }: Props)
             </div>
           ) : null}
 
-          <dl className="spm-facts" style={step(3)}>
-            {facts.map(([k, v]) => (
-              <div key={k}>
-                <dt>{k}</dt>
-                <dd>{v}</dd>
+          {speaker.highlights ? (
+            <div className="spm-tabs" role="tablist" aria-label="Profile view" style={step(3)}>
+              <button type="button" role="tab" aria-selected={view === "overview"} onClick={() => setView("overview")}>
+                Overview
+              </button>
+              <button type="button" role="tab" aria-selected={view === "story"} onClick={() => setView("story")}>
+                <span className="spark" aria-hidden="true">✦</span> Career story
+              </button>
+            </div>
+          ) : null}
+
+          {view === "story" && speaker.highlights ? (
+            <SpeakerStory key={speaker.id} highlights={speaker.highlights} firstName={speaker.firstName} />
+          ) : (
+            <>
+            <dl className="spm-facts" style={step(3)}>
+              {facts.map(([k, v]) => (
+                <div key={k}>
+                  <dt>{k}</dt>
+                  <dd>{v}</dd>
+                </div>
+              ))}
+            </dl>
+
+            {speaker.topic ? (
+              <div className="spm-block" style={step(4)}>
+                <div className="spm-label">Topic</div>
+                <p>{speaker.topic}</p>
               </div>
-            ))}
-          </dl>
+            ) : null}
 
-          {speaker.topic ? (
-            <div className="spm-block" style={step(4)}>
-              <div className="spm-label">Topic</div>
-              <p>{speaker.topic}</p>
-            </div>
-          ) : null}
-
-          {speaker.bio ? (
-            <div className="spm-block" style={step(5)}>
-              <div className="spm-label">About</div>
-              <p>{speaker.bio}</p>
-            </div>
-          ) : null}
+            {speaker.bio ? (
+              <div className="spm-block" style={step(5)}>
+                <div className="spm-label">About</div>
+                <p>{speaker.bio}</p>
+              </div>
+            ) : null}
+            </>
+          )}
 
           {linkedin ? (
             <a className="spm-li" href={linkedin} target="_blank" rel="noopener noreferrer" style={step(6)}>
