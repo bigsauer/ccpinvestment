@@ -15,9 +15,9 @@ export async function getClubSettings() {
       name: "Chaminade Investment Club",
       shortName: "CIC",
       foundedYear: "2024",
-      meetingLocation: "Little Theatre",
-      meetingTime: "7:45 AM",
-      seasonLabel: "Spring 2026",
+      meetingLocation: "Skip Little Theater",
+      meetingTime: "6:45 AM",
+      seasonLabel: "Fall 2026",
     }
   );
 }

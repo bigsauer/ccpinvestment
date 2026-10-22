@@ -18,7 +18,7 @@ export default async function GetInvolvedPage() {
           <PageBannerCopy
             blocks={blocks}
             crumbs="Get involved · Two ways in"
-            lede="If you're a student at Chaminade, apply to join — it's free, no experience needed, and meetings start at 7:45 AM Friday. If you're a working professional, come tell our students what you actually do — 35 minutes, real questions, no pitching."
+            lede="If you're a student at Chaminade, apply to join — it's free, no experience needed, and meetings start at 6:45 AM on Wednesday mornings. If you're a working professional, come tell our students what you actually do — 35 minutes, real questions, no pitching."
           >
             Pick the door <span className="serif">that&apos;s yours.</span>
           </PageBannerCopy>

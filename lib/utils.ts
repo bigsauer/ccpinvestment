@@ -57,7 +57,12 @@ export function dayNumber(date: Date) {
 export function linkedinHandle(url: string) {
   try {
     const parsed = new URL(url);
-    const path = parsed.pathname.replace(/\/+$/, "");
+    let path = parsed.pathname.replace(/\/+$/, "");
+    try {
+      path = decodeURIComponent(path); // show "®" instead of "%C2%AE"
+    } catch {
+      /* keep the encoded path */
+    }
     return `${parsed.hostname.replace(/^www\./, "")}${path}`;
   } catch {
     return url.replace(/^https?:\/\//, "").replace(/\/+$/, "");

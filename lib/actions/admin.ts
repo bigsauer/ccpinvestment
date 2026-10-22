@@ -156,8 +156,8 @@ export async function upsertMeeting(formData: FormData) {
   const id = str(formData, "id");
   const data = {
     date: new Date(str(formData, "date")),
-    time: str(formData, "time") || "7:45 AM",
-    location: str(formData, "location") || "Little Theatre",
+    time: str(formData, "time") || "6:45 AM",
+    location: str(formData, "location") || "Skip Little Theater",
     topic: str(formData, "topic"),
     format: str(formData, "format") || "Talk + Q&A",
     duration: str(formData, "duration") || "~45 min",

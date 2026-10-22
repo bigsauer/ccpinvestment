@@ -27,7 +27,7 @@ export default async function MeetingsPage() {
         <div className="wrap pb-content">
           <PageBannerCopy
             blocks={blocks}
-            crumbs="Meetings · Spring 2026"
+            crumbs="Meetings · Fall 2026"
             lede="Meeting cadence varies — we schedule around speaker availability. Every session lists date, time, the guest speaker, and a short background on their firm and role."
           >
             Schedule &amp; <span className="serif">upcoming sessions.</span>
@@ -45,12 +45,23 @@ export default async function MeetingsPage() {
                 <h3>
                   {next.speaker
                     ? displayName(next.speaker.firstName, next.speaker.lastName)
-                    : "To be announced"}
+                    : isStudentLed(next)
+                      ? next.format
+                      : "To be announced"}
                 </h3>
                 <div className="role">
-                  {next.speaker ? `${next.speaker.title} · ${next.speaker.firm}` : "Speaker locking in"}
+                  {next.speaker
+                    ? [next.speaker.title, next.speaker.firm].filter(Boolean).join(" · ")
+                    : isStudentLed(next)
+                      ? "Student-led session"
+                      : "Speaker locking in"}
                 </div>
-                <p className="bio">{next.speaker?.bio || "Details will appear here when the guest is confirmed."}</p>
+                <p className="bio">
+                  {next.speaker?.bio ||
+                    (next.speaker
+                      ? "More on this guest is coming soon."
+                      : next.topic || "Details will appear here when the guest is confirmed.")}
+                </p>
                 <div className="meta">
                   <div>
                     <div className="k">Time</div>
@@ -73,9 +84,11 @@ export default async function MeetingsPage() {
                   <Link href="/get-involved?tab=students" className="btn red">
                     RSVP as a guest <span className="arrow">→</span>
                   </Link>
-                  <Link href="/speakers" className="btn">
-                    Speaker bio
-                  </Link>
+                  {next.speaker ? (
+                    <Link href="/speakers" className="btn">
+                      Speaker bio
+                    </Link>
+                  ) : null}
                 </div>
               </div>
               <div className="right">
@@ -108,7 +121,7 @@ export default async function MeetingsPage() {
                     </a>
                     <a
                       className="cal-btn"
-                      href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(next.topic || "CIC meeting")}&dates=${toGCal(next.date)}`}
+                      href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(calendarTitle(next))}&dates=${toGCal(next.date)}`}
                       target="_blank"
                       rel="noreferrer"
                     >
@@ -151,10 +164,16 @@ export default async function MeetingsPage() {
                 </div>
                 <div className="cell-time">{meeting.time}</div>
                 <div className="cell-speaker">
-                  {meeting.speaker ? displayName(meeting.speaker.firstName, meeting.speaker.lastName) : "To be announced"}
+                  {meeting.speaker
+                    ? displayName(meeting.speaker.firstName, meeting.speaker.lastName)
+                    : isStudentLed(meeting)
+                      ? "Student-led"
+                      : "To be announced"}
                 </div>
-                <div className="cell-firm">{meeting.speaker ? `${meeting.speaker.firm} — ${meeting.speaker.title}` : "—"}</div>
-                <div className="cell-topic">{meeting.topic || "—"}</div>
+                <div className="cell-firm">
+                  {meeting.speaker ? [meeting.speaker.firm, meeting.speaker.title].filter(Boolean).join(" — ") : "—"}
+                </div>
+                <div className="cell-topic">{isStudentLed(meeting) ? meeting.format : meeting.topic || "—"}</div>
                 <div className="cell-status">
                   <span className={`pill ${index === 0 ? "live" : meeting.status === "TENTATIVE" ? "tba" : ""}`}>
                     {meetingStatusLabel(meeting.status, index === 0)}
@@ -215,4 +234,14 @@ function toGCal(date: Date) {
   const endDate = new Date(date.getTime() + 45 * 60 * 1000);
   const end = endDate.toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
   return `${start}/${end}`;
+}
+
+/** A meeting with no guest speaker and a non-default format (e.g. student stock pitches). */
+function isStudentLed(meeting: { speaker: unknown; format: string }) {
+  return !meeting.speaker && meeting.format !== "Talk + Q&A";
+}
+
+function calendarTitle(meeting: { speaker: { firstName: string; lastName: string } | null; format: string }) {
+  if (meeting.speaker) return `CIC — ${meeting.speaker.firstName} ${meeting.speaker.lastName}`;
+  return isStudentLed(meeting) ? `CIC — ${meeting.format}` : "CIC meeting";
 }

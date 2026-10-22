@@ -73,7 +73,7 @@ export function GetInvolved() {
                   A room of <span className="serif">working professionals,</span> answering your questions.
                 </h2>
                 <p className="gi-club-intro">
-                  The Chaminade Investment Club meets every other Friday morning. Each meeting brings in one working
+                  The Chaminade Investment Club meets every other Wednesday morning. Each meeting brings in one working
                   professional — a portfolio manager, an investment banker, a hedge-fund analyst, a startup founder —
                   for an honest conversation about how their world actually operates. Not a lecture. A real conversation,
                   with real questions students prepared the week before.

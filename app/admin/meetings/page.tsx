@@ -32,11 +32,11 @@ export default async function AdminMeetingsPage() {
             </div>
             <div className="field">
               <label>Time</label>
-              <input name="time" defaultValue="7:45 AM" />
+              <input name="time" defaultValue="6:45 AM" />
             </div>
             <div className="field">
               <label>Location</label>
-              <input name="location" defaultValue="Little Theatre" />
+              <input name="location" defaultValue="Skip Little Theater" />
             </div>
             <div className="field">
               <label>Speaker</label>

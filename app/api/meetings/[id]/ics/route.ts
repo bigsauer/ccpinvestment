@@ -19,7 +19,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     .replace(/\.\d+Z$/, "Z");
   const title = meeting.speaker
     ? `CIC — ${meeting.speaker.firstName} ${meeting.speaker.lastName}`
-    : "CIC meeting";
+    : meeting.format !== "Talk + Q&A"
+      ? `CIC — ${meeting.format}`
+      : "CIC meeting";
   const ics = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
