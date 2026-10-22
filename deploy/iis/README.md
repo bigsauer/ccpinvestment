@@ -43,6 +43,17 @@ AUTH_URL=https://your-iis-hostname
 
 Stdout from Node lands in `logs\`. If the site 502s, read that log first — usually missing env, wrong Node path, or a Mac-built Prisma engine.
 
+## Updating the site (one command)
+
+On the Windows server, in **Command Prompt as Administrator**:
+
+```bat
+cd %USERPROFILE%\ccpinvestment
+scripts\update-iis.cmd
+```
+
+It pulls the latest code, builds on Windows, stops the site's app pool, copies `.next`, `node_modules`, `public`, `server.js` and `package.json` over the live folder, starts the pool again, and checks `/api/health`. The live `web.config` and `.env` are never overwritten. It is a `.cmd` (not `.ps1`) because the server's policy blocks PowerShell scripts. Edit the settings at the top of the script if the folder or site name changes.
+
 ## What IIS is doing
 
 `web.config` starts `node server.js` and forwards every request to the port HttpPlatformHandler assigns. TypeScript never hits IIS.
