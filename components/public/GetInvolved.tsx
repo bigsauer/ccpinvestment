@@ -24,6 +24,7 @@ export function GetInvolved() {
 
   return (
     <>
+      <h2 className="sr-only">Two ways to get involved</h2>
       <div className="gi-doors">
         <div className="wrap">
           <div className="gi-doors-inner">

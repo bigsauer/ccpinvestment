@@ -31,7 +31,7 @@ export default async function GetInvolvedPage() {
           </PageBannerCopy>
         </div>
       </header>
-      <Suspense fallback={<div className="wrap" style={{ padding: "48px 0" }}>Loading forms…</div>}>
+      <Suspense fallback={<div className="wrap" style={{ padding: "48px 0", minHeight: 1400 }}>Loading forms…</div>}>
         <GetInvolved />
       </Suspense>
       </main>
