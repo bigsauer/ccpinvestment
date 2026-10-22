@@ -49,7 +49,7 @@ export async function getPastMeetings() {
 
 export async function getSpeakers() {
   const speakers = await prisma.speaker.findMany({
-    orderBy: [{ status: "asc" }, { sessionDate: "desc" }],
+    orderBy: [{ status: "asc" }, { sessionDate: { sort: "desc", nulls: "last" } }],
   });
   return speakers.map((speaker) => ({
     ...speaker,

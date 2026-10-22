@@ -68,10 +68,7 @@ export function SpeakerArchive({ speakers }: { speakers: PublicSpeaker[] }) {
               <div className="spkr-name">
                 {speaker.firstName} {speaker.lastName}
               </div>
-              <div className="spkr-role">
-                {speaker.title}
-                {speaker.firm ? `, ${speaker.firm}` : ""}
-              </div>
+              <div className="spkr-role">{[speaker.title, speaker.firm].filter(Boolean).join(", ")}</div>
               {speaker.topic ? <p className="spkr-topic">{speaker.topic}</p> : null}
               {linkedin ? (
                 <a className="spkr-linkedin" href={linkedin} target="_blank" rel="noopener noreferrer">
@@ -91,12 +88,7 @@ export function SpeakerArchive({ speakers }: { speakers: PublicSpeaker[] }) {
           <span className="em">No speakers in this filter</span>
           Officers add guests from the admin archive as sessions lock in.
         </div>
-      ) : (
-        <div className="empty-note">
-          <span className="em">Seed / demo archive</span>
-          Replace names, roles, and photos with confirmed guests before a public launch.
-        </div>
-      )}
+      ) : null}
     </>
   );
 }
