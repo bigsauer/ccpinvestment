@@ -42,6 +42,9 @@ export default async function SpeakersPage() {
               status: speaker.status,
               sessionDate: speaker.sessionDate?.toISOString() ?? null,
               linkedinUrl: speaker.linkedinUrl,
+              photoUrl: speaker.photoUrl,
+              bio: speaker.bio,
+              industry: speaker.industry,
             }))}
           />
         </div>
