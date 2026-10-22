@@ -10,28 +10,37 @@ function partsUntil(target: Date) {
   return { days, hours, mins };
 }
 
+type Parts = ReturnType<typeof partsUntil>;
+
+/**
+ * The clock depends on "now", so the server HTML can never match the browser.
+ * Render placeholders on the server and the first client render, then fill in after mount.
+ */
 export function Countdown({ target }: { target: string }) {
-  const date = new Date(target);
-  const [parts, setParts] = useState(() => partsUntil(date));
+  const [parts, setParts] = useState<Parts | null>(null);
 
   useEffect(() => {
     const next = new Date(target);
-    const id = window.setInterval(() => setParts(partsUntil(next)), 30000);
+    const tick = () => setParts(partsUntil(next));
+    tick();
+    const id = window.setInterval(tick, 30000);
     return () => window.clearInterval(id);
   }, [target]);
 
+  const show = (n: number | undefined) => (n === undefined ? "--" : String(n).padStart(2, "0"));
+
   return (
-    <div className="cd">
+    <div className="cd" role="timer" aria-label="Time until the next session">
       <div className="cd-box">
-        <div className="n">{String(parts.days).padStart(2, "0")}</div>
+        <div className="n">{show(parts?.days)}</div>
         <div className="l">Days</div>
       </div>
       <div className="cd-box">
-        <div className="n">{String(parts.hours).padStart(2, "0")}</div>
+        <div className="n">{show(parts?.hours)}</div>
         <div className="l">Hrs</div>
       </div>
       <div className="cd-box">
-        <div className="n">{String(parts.mins).padStart(2, "0")}</div>
+        <div className="n">{show(parts?.mins)}</div>
         <div className="l">Min</div>
       </div>
     </div>

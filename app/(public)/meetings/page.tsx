@@ -71,6 +71,7 @@ export default async function MeetingsPage() {
     <>
       {events.length > 0 ? <JsonLd data={events.map((e) => ({ "@context": "https://schema.org", ...e }))} /> : null}
       <PublicNav />
+      <main>
       <header className="page-banner">
         <Image className="pb-img" src="/photos/session-04.jpg" alt="Chaminade Investment Club meeting" fill priority sizes="100vw" />
         <div className="pb-overlay" />
@@ -277,6 +278,7 @@ export default async function MeetingsPage() {
           </div>
         </div>
       </section>
+      </main>
     </>
   );
 }

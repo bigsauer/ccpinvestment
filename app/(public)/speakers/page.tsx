@@ -38,6 +38,7 @@ export default async function SpeakersPage() {
         }}
       />
       <PublicNav />
+      <main>
       <header className="page-banner">
         <Image className="pb-img" src="/photos/session-05.jpg" alt="Chaminade Investment Club meeting" fill priority sizes="100vw" />
         <div className="pb-overlay" />
@@ -73,6 +74,7 @@ export default async function SpeakersPage() {
           />
         </div>
       </section>
+      </main>
     </>
   );
 }

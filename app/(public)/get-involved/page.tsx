@@ -19,6 +19,7 @@ export default async function GetInvolvedPage() {
   return (
     <>
       <PublicNav />
+      <main>
       <header className="page-banner gi-banner">
         <div className="wrap pb-content">
           <PageBannerCopy
@@ -33,6 +34,7 @@ export default async function GetInvolvedPage() {
       <Suspense fallback={<div className="wrap" style={{ padding: "48px 0" }}>Loading forms…</div>}>
         <GetInvolved />
       </Suspense>
+      </main>
     </>
   );
 }

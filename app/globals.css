@@ -20,8 +20,8 @@
   --line-2: #d4d3cd;
   --ink: #0f0f10;
   --ink-2: #3a3a3d;
-  --ink-3: #6a6a6e;
-  --ink-4: #9b9ba0;
+  --ink-3: #55555a;
+  --ink-4: #6b6b70;
   --red: #c41e28;
   --red-2: #a21820;
   --red-soft: #fde8ea;
@@ -785,7 +785,7 @@ h1.display .red { color: var(--red); }
   --line-2: #d4d3cd;
   --ink: #0f0f10;
   --ink-2: #3a3a3d;
-  --ink-3: #6a6a6e;
+  --ink-3: #55555a;
   --ink-4: #9b9ba0;
   --red: #c41e28;
   --red-2: #a21820;

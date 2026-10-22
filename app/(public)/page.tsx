@@ -51,6 +51,7 @@ export default async function HomePage() {
         }}
       />
       <PublicNav showNextMeeting />
+      <main>
       <header className="hero-photo">
         <div className="hero-photo-inner">
           <Image
@@ -239,6 +240,7 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+      </main>
     </>
   );
 }
