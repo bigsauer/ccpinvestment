@@ -63,3 +63,25 @@ export function tagLabel(speaker: PublicSpeaker) {
   }).format(new Date(speaker.sessionDate));
   return speaker.status === "UPCOMING" ? `Upcoming · ${label}` : `Past · ${label}`;
 }
+
+/** One-line description for share sheets: who they are and when they speak or spoke. */
+export function speakerShareText(speaker: {
+  firstName: string;
+  lastName: string;
+  title: string;
+  firm: string;
+  status: string;
+  sessionDate: Date | string | null;
+}) {
+  const name = `${speaker.firstName} ${speaker.lastName}`;
+  const role = [speaker.title, speaker.firm].filter(Boolean).join(", ");
+  const upcoming = speaker.status === "UPCOMING";
+  const when = speaker.sessionDate
+    ? new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "America/Chicago" }).format(
+        new Date(speaker.sessionDate),
+      )
+    : null;
+  const lead = role ? `${name}, ${role}` : name;
+  if (when) return `${lead}: ${upcoming ? "speaking to Chaminade Investment Club students on" : "spoke to Chaminade Investment Club students on"} ${when}`;
+  return `${lead}: ${upcoming ? "an upcoming guest speaker" : "a past guest speaker"} at Chaminade Investment Club`;
+}

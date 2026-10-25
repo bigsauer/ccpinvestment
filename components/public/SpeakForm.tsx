@@ -14,8 +14,6 @@ const TOPICS = [
   "Other",
 ];
 
-const FORMATS = ["In-person", "Virtual", "Either"] as const;
-
 /** "2026-11-06" -> "Fri, Nov 6, 2026" (parsed as a local date so the day never shifts). */
 function prettyDate(value: string) {
   const [y, m, d] = value.split("-").map(Number);
@@ -31,7 +29,6 @@ function todayISO() {
 }
 export function SpeakForm() {
   const [topics, setTopics] = useState<string[]>([]);
-  const [format, setFormat] = useState<(typeof FORMATS)[number]>("In-person");
   const [dates, setDates] = useState<string[]>([]);
   const [pendingDate, setPendingDate] = useState("");
   const [flexible, setFlexible] = useState(false);
@@ -201,23 +198,6 @@ export function SpeakForm() {
       <div className="form-section">
         <div className="form-section-h">
           <span className="num">04</span> · Logistics
-        </div>
-        <div className="field">
-          <label>Format preference</label>
-          <div className="topic-chips">
-            {FORMATS.map((value) => (
-              <button
-                key={value}
-                type="button"
-                className={format === value ? "topic-chip on" : "topic-chip"}
-                disabled={state.ok}
-                onClick={() => setFormat(value)}
-              >
-                {value}
-              </button>
-            ))}
-          </div>
-          <input type="hidden" name="format" value={format} />
         </div>
         <div className="field">
           <label htmlFor="spk-date">

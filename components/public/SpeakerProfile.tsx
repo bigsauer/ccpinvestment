@@ -4,10 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
+import { ShareButton } from "@/components/public/ShareButton";
 import { SpeakerStory } from "@/components/public/SpeakerStory";
 import { safeHttpUrl } from "@/lib/safe-url";
-import { localPhoto, tagLabel, type PublicSpeaker } from "@/lib/speakers";
-import { speakerSlug } from "@/lib/site";
+import { localPhoto, speakerShareText, tagLabel, type PublicSpeaker } from "@/lib/speakers";
+import { SITE, absoluteUrl, speakerSlug } from "@/lib/site";
 import { linkedinHandle } from "@/lib/utils";
 
 const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -194,6 +195,14 @@ export function SpeakerProfile({ speakers, activeId, onSelect, onClose, startVie
               <span className="arrow">↗</span>
             </a>
           ) : null}
+
+          <div className="spm-share" style={step(7)}>
+            <ShareButton
+              title={SITE.name}
+              text={speakerShareText(speaker)}
+              url={absoluteUrl(`/speakers/${speakerSlug(speaker.firstName, speaker.lastName)}`)}
+            />
+          </div>
 
           <Link className="spm-full" href={`/speakers/${speakerSlug(speaker.firstName, speaker.lastName)}`} style={step(7)}>
             Open full page <span aria-hidden="true">→</span>

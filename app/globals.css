@@ -1861,3 +1861,4 @@ button.gi-door { width: 100%; text-align: left; background: transparent; border:
 /* === Share button === */
 .share-btn { display: inline-flex; align-items: center; gap: 8px; }
 .share-btn svg { flex: none; }
+.spm-share { margin-top: 14px; }

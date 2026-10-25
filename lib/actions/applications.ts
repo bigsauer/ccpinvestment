@@ -73,7 +73,6 @@ export async function submitSpeakerApplication(
     const topics = String(formData.get("topics") ?? "").trim();
     const sessionTitle = required(formData.get("sessionTitle"), "Working title");
     const abstract = required(formData.get("abstract"), "What you'd cover");
-    const format = String(formData.get("format") ?? "In-person");
     const dates = String(formData.get("dates") ?? "").trim();
     const notes = String(formData.get("notes") ?? "").trim();
 
@@ -95,7 +94,6 @@ export async function submitSpeakerApplication(
           topics,
           sessionTitle,
           abstract,
-          format,
           dates,
           notes,
         },

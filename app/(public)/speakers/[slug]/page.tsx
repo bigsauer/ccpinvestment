@@ -3,7 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PublicNav } from "@/components/public/Nav";
-import { localPhoto, parseHighlights, tagLabel } from "@/lib/speakers";
+import { ShareButton } from "@/components/public/ShareButton";
+import { localPhoto, parseHighlights, speakerShareText, tagLabel } from "@/lib/speakers";
 import { SpeakerStory } from "@/components/public/SpeakerStory";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getMeetingForSpeaker, getSpeakerBySlug, getSpeakers } from "@/lib/queries";
@@ -208,6 +209,11 @@ export default async function SpeakerPage({ params }: { params: Promise<Params> 
                     RSVP as a guest <span className="arrow">→</span>
                   </Link>
                 ) : null}
+                <ShareButton
+                  title={SITE.name}
+                  text={speakerShareText(speaker)}
+                  url={absoluteUrl(`/speakers/${speakerSlug(speaker.firstName, speaker.lastName)}`)}
+                />
                 <Link href="/speakers" className="btn">
                   ← All speakers
                 </Link>
