@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { CountUp } from "@/components/public/CountUp";
+import { ShareButton } from "@/components/public/ShareButton";
 import { Countdown } from "@/components/public/Countdown";
 import { PublicNav } from "@/components/public/Nav";
 import { PageBannerCopy } from "@/components/public/PageBannerCopy";
@@ -189,6 +190,13 @@ export default async function MeetingsPage() {
                         Speaker profile
                       </Link>
                     ) : null}
+                    <ShareButton
+                      title={SITE.name}
+                      text={`${
+                        next.speaker ? displayName(next.speaker.firstName, next.speaker.lastName) : nextStudent ? next.format : "Next meeting"
+                      }: ${weekdayName(next.date)}, ${monthName(next.date)} ${dayNumber(next.date)} at ${next.time}, ${next.location}`}
+                      url={absoluteUrl("/meetings")}
+                    />
                   </div>
                 </div>
                 <div className="right">

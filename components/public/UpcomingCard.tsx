@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { localPhoto } from "@/lib/speakers";
-import { speakerSlug } from "@/lib/site";
+import { ShareButton } from "@/components/public/ShareButton";
+import { SITE, absoluteUrl, speakerSlug } from "@/lib/site";
 import { dayNumber, displayName, monthName, weekdayName } from "@/lib/utils";
 
 export type UpcomingMeeting = {
@@ -147,6 +148,11 @@ export function UpcomingCard({ meeting, isNext }: { meeting: UpcomingMeeting; is
           <a className="btn" href={`/api/meetings/${meeting.id}/ics`}>
             Add to calendar
           </a>
+          <ShareButton
+            title={SITE.name}
+            text={`${s ? displayName(s.firstName, s.lastName) : student ? meeting.format : "Club meeting"}: ${weekdayName(meeting.date)}, ${monthName(meeting.date)} ${dayNumber(meeting.date)} at ${meeting.time}, ${meeting.location}`}
+            url={absoluteUrl("/meetings")}
+          />
           <Link href="/get-involved?tab=students" className="btn red">
             RSVP <span className="arrow">→</span>
           </Link>

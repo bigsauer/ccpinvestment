@@ -1857,3 +1857,7 @@ button.gi-door { width: 100%; text-align: left; background: transparent; border:
 @media (max-width: 960px) { .members-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 600px) { .members-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } .members-block { margin-top: 16px; } }
 @media (prefers-reduced-motion: reduce) { .member-card, .member-photo img { transition: none !important; } }
+
+/* === Share button === */
+.share-btn { display: inline-flex; align-items: center; gap: 8px; }
+.share-btn svg { flex: none; }
