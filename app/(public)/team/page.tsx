@@ -3,7 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { PublicNav } from "@/components/public/Nav";
 import { PageBannerCopy } from "@/components/public/PageBannerCopy";
-import { getLivePageBlocks, getPublicOfficers } from "@/lib/queries";
+import { getLivePageBlocks, getPublicMembers, getPublicOfficers } from "@/lib/queries";
+import { localPhoto } from "@/lib/speakers";
 import { pageMeta } from "@/lib/site";
 import { initials, roleLabel } from "@/lib/utils";
 
@@ -16,7 +17,11 @@ export const metadata: Metadata = pageMeta({
 export const revalidate = 60;
 
 export default async function TeamPage() {
-  const [officers, blocks] = await Promise.all([getPublicOfficers(), getLivePageBlocks("team")]);
+  const [officers, blocks, members] = await Promise.all([
+    getPublicOfficers(),
+    getLivePageBlocks("team"),
+    getPublicMembers(),
+  ]);
   const leadership = officers.filter((officer) => officer.role !== "ADVISOR");
   const advisor = officers.find((officer) => officer.role === "ADVISOR");
 
@@ -71,6 +76,36 @@ export default async function TeamPage() {
               <Link href="/get-involved?tab=students" className="btn">
                 Contact advisor
               </Link>
+            </div>
+          ) : null}
+          {members.length > 0 ? (
+            <div className="members-block">
+              <div className="section-head">
+                <div>
+                  <div className="section-label">Members</div>
+                  <h2>The room.</h2>
+                </div>
+                <p>Students who show up early, do the reading, and keep the club running.</p>
+              </div>
+              <div className="members-grid">
+                {members.map((member) => {
+                  const photo = localPhoto(member.photoUrl);
+                  const fullName = `${member.firstName} ${member.lastName}`;
+                  return (
+                    <div key={member.id} className="member-card">
+                      <div className="member-photo">
+                        {photo ? (
+                          <Image src={photo} alt={fullName} fill sizes="(max-width: 600px) 50vw, (max-width: 960px) 33vw, 20vw" />
+                        ) : (
+                          <div className="spkr-fallback">{initials(fullName)}</div>
+                        )}
+                      </div>
+                      <div className="member-name">{fullName}</div>
+                      <div className="member-class">Class of {member.gradYear}</div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           ) : null}
           <div className="values">

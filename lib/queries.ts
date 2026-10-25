@@ -71,6 +71,15 @@ export async function getPublicOfficers() {
   });
 }
 
+/** Active members who have supplied a photo for the site. Names and photos only, never email. */
+export async function getPublicMembers() {
+  return prisma.member.findMany({
+    where: { status: "ACTIVE", photoUrl: { not: null } },
+    orderBy: [{ gradYear: "asc" }, { lastName: "asc" }, { firstName: "asc" }],
+    select: { id: true, firstName: true, lastName: true, gradYear: true, photoUrl: true },
+  });
+}
+
 export async function getDashboardStats() {
   const now = new Date();
   const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);

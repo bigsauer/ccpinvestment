@@ -72,6 +72,8 @@ model Member {
   lastName  String
   email     String       @unique
   gradYear  String
+  /// Optional photo (a path under /public). Only members with a photo are listed on the public Team page.
+  photoUrl  String?
   status    MemberStatus @default(PENDING)
   joinedAt  DateTime     @default(now())
   role      String?
