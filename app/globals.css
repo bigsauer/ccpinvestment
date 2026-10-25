@@ -1844,7 +1844,8 @@ button.gi-door { width: 100%; text-align: left; background: transparent; border:
 @media (prefers-reduced-motion: reduce) { .spkr-story-chip span { animation: none; } }
 
 /* === TEAM: member photo cards === */
-.members-block { margin-top: 72px; }
+.members-block { margin-top: 24px; }
+.officers + .members-block { margin-top: 40px; }
 .members-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
 .member-card { background: var(--bg-2); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; padding-bottom: 14px; transition: transform .3s cubic-bezier(.2,.7,.2,1), border-color .2s, box-shadow .3s; }
 .member-card:hover { transform: translateY(-3px); border-color: var(--line-2); box-shadow: 0 22px 44px -28px rgba(0,0,0,0.3); }
@@ -1854,5 +1855,5 @@ button.gi-door { width: 100%; text-align: left; background: transparent; border:
 .member-name { font-size: 16px; font-weight: 500; letter-spacing: -0.01em; margin: 12px 14px 2px; }
 .member-class { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--red); margin: 0 14px; }
 @media (max-width: 960px) { .members-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 600px) { .members-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } .members-block { margin-top: 48px; } }
+@media (max-width: 600px) { .members-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } .members-block { margin-top: 16px; } }
 @media (prefers-reduced-motion: reduce) { .member-card, .member-photo img { transition: none !important; } }

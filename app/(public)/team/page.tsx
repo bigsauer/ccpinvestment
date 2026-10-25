@@ -47,11 +47,14 @@ export default async function TeamPage() {
         <div className="wrap">
           <div className="section-head">
             <div>
-              <div className="section-label">Officers · Spring 2026</div>
-              <h2>The leadership team.</h2>
+              <div className="section-label">The team</div>
+              <h2>
+                Officers <span className="serif">&amp; members.</span>
+              </h2>
             </div>
-            <p>Elected each year. Officer names populate here from the admin roster.</p>
+            <p>Student-run end to end: elected officers, the members who show up, and a faculty advisor behind them.</p>
           </div>
+          {leadership.length > 0 ? (
           <div className="officers">
             {leadership.map((officer) => (
               <div key={officer.id} className="officer">
@@ -65,28 +68,9 @@ export default async function TeamPage() {
               </div>
             ))}
           </div>
-          {advisor ? (
-            <div className="advisor">
-              <div className="av">{initials(advisor.name)}</div>
-              <div>
-                <div className="kn">Faculty advisor</div>
-                <div className="nm">{advisor.name}</div>
-                <div className="rl">{advisor.bio ?? "Faculty, Chaminade College Preparatory School"}</div>
-              </div>
-              <Link href="/get-involved?tab=students" className="btn">
-                Contact advisor
-              </Link>
-            </div>
           ) : null}
           {members.length > 0 ? (
             <div className="members-block">
-              <div className="section-head">
-                <div>
-                  <div className="section-label">Members</div>
-                  <h2>The room.</h2>
-                </div>
-                <p>Students who show up early, do the reading, and keep the club running.</p>
-              </div>
               <div className="members-grid">
                 {members.map((member) => {
                   const photo = localPhoto(member.photoUrl);
@@ -106,6 +90,19 @@ export default async function TeamPage() {
                   );
                 })}
               </div>
+            </div>
+          ) : null}
+          {advisor ? (
+            <div className="advisor">
+              <div className="av">{initials(advisor.name)}</div>
+              <div>
+                <div className="kn">Faculty advisor</div>
+                <div className="nm">{advisor.name}</div>
+                <div className="rl">{advisor.bio ?? "Faculty, Chaminade College Preparatory School"}</div>
+              </div>
+              <Link href="/get-involved?tab=students" className="btn">
+                Contact advisor
+              </Link>
             </div>
           ) : null}
           <div className="values">
