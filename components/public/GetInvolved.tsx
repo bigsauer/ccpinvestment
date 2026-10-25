@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { JoinForm } from "@/components/public/JoinForm";
+import { ShareButton } from "@/components/public/ShareButton";
 import { SpeakForm } from "@/components/public/SpeakForm";
+import { SITE, absoluteUrl } from "@/lib/site";
 
 type Tab = "students" | "speakers";
 
@@ -84,11 +86,27 @@ export function GetInvolved() {
                   to want a finance career. What you need is curiosity about how money, decisions, and careers actually
                   work in the wild — and a willingness to show up at 6:45 AM.
                 </p>
+                <div className="gi-share">
+                  <span>Know someone who&apos;d be into this?</span>
+                  <ShareButton
+                    title={SITE.name}
+                    text="Apply to join the Chaminade Investment Club: free, open to all grades, no experience needed. Meetings are Wednesday mornings at 6:45 AM."
+                    url={absoluteUrl("/get-involved?tab=students")}
+                  />
+                </div>
               </div>
               <JoinForm />
             </div>
           ) : (
             <div className="speak-wrap speak-solo">
+              <div className="gi-share">
+                <span>Know a professional who should speak?</span>
+                <ShareButton
+                  title={SITE.name}
+                  text="Come speak to Chaminade Investment Club students: one working professional per meeting, 35 minutes, real questions, no pitching."
+                  url={absoluteUrl("/get-involved?tab=speakers")}
+                />
+              </div>
               <SpeakForm />
             </div>
           )}

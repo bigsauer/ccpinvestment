@@ -1862,3 +1862,5 @@ button.gi-door { width: 100%; text-align: left; background: transparent; border:
 .share-btn { display: inline-flex; align-items: center; gap: 8px; }
 .share-btn svg { flex: none; }
 .spm-share { margin-top: 14px; }
+.gi-share { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 22px 0 0; font-size: 14.5px; color: var(--ink-2); }
+.speak-solo > .gi-share { margin: 0 0 20px; }
