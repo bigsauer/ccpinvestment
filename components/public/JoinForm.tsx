@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import { submitStudentApplication, type FormState } from "@/lib/actions/applications";
 
-const INTERESTS = ["Curious", "Regular member", "Officer track"] as const;
+const INTERESTS = ["Curious", "Regular member"] as const;
 
 export function JoinForm() {
   const [interest, setInterest] = useState<(typeof INTERESTS)[number]>("Regular member");
