@@ -194,7 +194,7 @@ export default async function MeetingsPage() {
                       title={SITE.name}
                       text={`${
                         next.speaker ? displayName(next.speaker.firstName, next.speaker.lastName) : nextStudent ? next.format : "Next meeting"
-                      }: ${weekdayName(next.date)}, ${monthName(next.date)} ${dayNumber(next.date)} at ${next.time}, ${next.location}`}
+                      }: ${weekdayName(next.date)}, ${monthName(next.date)} ${Number(dayNumber(next.date))} at ${next.time}, ${next.location}`}
                       url={absoluteUrl("/meetings")}
                     />
                   </div>

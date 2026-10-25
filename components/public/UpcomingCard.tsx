@@ -150,7 +150,7 @@ export function UpcomingCard({ meeting, isNext }: { meeting: UpcomingMeeting; is
           </a>
           <ShareButton
             title={SITE.name}
-            text={`${s ? displayName(s.firstName, s.lastName) : student ? meeting.format : "Club meeting"}: ${weekdayName(meeting.date)}, ${monthName(meeting.date)} ${dayNumber(meeting.date)} at ${meeting.time}, ${meeting.location}`}
+            text={`${s ? displayName(s.firstName, s.lastName) : student ? meeting.format : "Club meeting"}: ${weekdayName(meeting.date)}, ${monthName(meeting.date)} ${Number(dayNumber(meeting.date))} at ${meeting.time}, ${meeting.location}`}
             url={absoluteUrl("/meetings")}
           />
           <Link href="/get-involved?tab=students" className="btn red">
