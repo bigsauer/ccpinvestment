@@ -39,7 +39,7 @@ export function GetInvolved() {
               <h3>
                 Apply to <span className="serif">join the club.</span>
               </h3>
-              <p>Open to all Chaminade grades. Submit one form, an officer follows up before the next meeting.</p>
+              <p>Open to all Chaminade grades. Submit one form, and the club follows up before the next meeting.</p>
               <span className="arrow-go">
                 Open <span className="ar">→</span>
               </span>

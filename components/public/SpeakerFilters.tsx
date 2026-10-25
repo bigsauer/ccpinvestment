@@ -121,7 +121,7 @@ export function SpeakerArchive({ speakers }: { speakers: PublicSpeaker[] }) {
       {visible.length === 0 ? (
         <div className="empty-note">
           <span className="em">No speakers in this filter</span>
-          Officers add guests from the admin archive as sessions lock in.
+          Guests are added here as sessions lock in.
         </div>
       ) : null}
 

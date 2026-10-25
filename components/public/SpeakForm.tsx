@@ -291,7 +291,7 @@ export function SpeakForm() {
       <div className="form-foot">
         <div className="note">
           <span style={{ width: 6, height: 6, borderRadius: 999, background: "var(--green)", display: "inline-block" }} />
-          Routes to officers + faculty advisor
+          Routes to the club + faculty advisor
         </div>
         <button type="submit" className="btn red lg" disabled={pending || state.ok}>
           {state.ok ? "Submitted ✓" : pending ? "Submitting…" : "Submit application"}
@@ -300,7 +300,7 @@ export function SpeakForm() {
       </div>
       {state.ok ? (
         <div className="ok-msg show">
-          <span>✓</span> Thank you — an officer will be in touch within 5 school days to confirm a date.
+          <span>✓</span> Thank you — someone from the club will be in touch within 5 school days to confirm a date.
         </div>
       ) : null}
       {state.error ? (

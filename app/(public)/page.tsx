@@ -211,7 +211,7 @@ export default async function HomePage() {
               Run by students, <span className="serif">built for real work.</span>
             </h2>
             <p>
-              Officers manage outreach, programming, and the portfolio. Members come prepared — with reading done,
+              Members share the work of outreach, programming, and the portfolio. Everyone comes prepared — with reading done,
               questions ready, and pitches that can be defended.
             </p>
             <p>

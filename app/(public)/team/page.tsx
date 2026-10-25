@@ -9,9 +9,9 @@ import { pageMeta } from "@/lib/site";
 import { initials, roleLabel } from "@/lib/utils";
 
 export const metadata: Metadata = pageMeta({
-  title: "Student Officers & Faculty Advisor",
+  title: "The Team: Student Members & Faculty Advisor",
   description:
-    "Meet the student officers who run the Chaminade Investment Club, and the faculty advisor who supports them, at Chaminade College Preparatory School in St. Louis.",
+    "Meet the students who run the Chaminade Investment Club together, and the faculty advisor who supports them, at Chaminade College Preparatory School in St. Louis.",
   path: "/team",
 });
 export const revalidate = 60;
@@ -35,8 +35,8 @@ export default async function TeamPage() {
         <div className="wrap pb-content">
           <PageBannerCopy
             blocks={blocks}
-            crumbs="Team · Officers & Advisor"
-            lede="Officers handle everything: speaker outreach, programming, the paper portfolio, and operations. No faculty ghost-writer, no pre-made script."
+            crumbs="Team · Members & Advisor"
+            lede="Members run the club together: speaker outreach, programming, the paper portfolio, and everything in between. No faculty ghost-writer, no pre-made script."
           >
             Student-run, <span className="serif">end to end.</span>
           </PageBannerCopy>
@@ -49,10 +49,10 @@ export default async function TeamPage() {
             <div>
               <div className="section-label">The team</div>
               <h2>
-                Officers <span className="serif">&amp; members.</span>
+                The people <span className="serif">behind it.</span>
               </h2>
             </div>
-            <p>Student-run end to end: elected officers, the members who show up, and a faculty advisor behind them.</p>
+            <p>Student-run end to end. The work is shared, with a faculty advisor behind us.</p>
           </div>
           {leadership.length > 0 ? (
           <div className="officers">
@@ -113,8 +113,8 @@ export default async function TeamPage() {
             </div>
             <div className="value">
               <div className="k">02 / OWNERSHIP</div>
-              <h3>Officers do the work.</h3>
-              <p>Every event, contact, and meeting agenda is owned by a student. No hand-holding.</p>
+              <h3>Members do the work.</h3>
+              <p>Every event, contact, and meeting agenda is owned by students working together. No hand-holding.</p>
             </div>
             <div className="value">
               <div className="k">03 / STANDARD</div>

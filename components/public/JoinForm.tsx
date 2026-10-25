@@ -76,7 +76,7 @@ export function JoinForm() {
       <div className="form-foot">
         <div className="note">
           <span style={{ width: 6, height: 6, borderRadius: 999, background: "var(--green)", display: "inline-block" }} />
-          Routes to officers
+          Routes to the club
         </div>
         <button type="submit" className="btn red lg" disabled={pending || state.ok}>
           {state.ok ? "Submitted ✓" : pending ? "Submitting…" : "Submit application"}
@@ -85,7 +85,7 @@ export function JoinForm() {
       </div>
       {state.ok ? (
         <div className="ok-msg show">
-          <span>✓</span> Received — an officer will be in touch within a few school days.
+          <span>✓</span> Received — someone from the club will be in touch within a few school days.
         </div>
       ) : null}
       {state.error ? (

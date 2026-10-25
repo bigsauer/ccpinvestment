@@ -238,7 +238,7 @@ export default async function MeetingsPage() {
           ) : (
             <div className="empty-note" style={{ marginBottom: 48 }}>
               <span className="em">No upcoming session</span>
-              Officers publish the next meeting from the admin calendar.
+              The next meeting is posted here as soon as it's scheduled.
             </div>
           )}
 
