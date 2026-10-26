@@ -42,6 +42,7 @@ Set these before the first deploy. The app throws on boot if any required value 
 | `DATABASE_URL` | yes | Vercel Postgres / Neon connection string |
 | `AUTH_SECRET` | yes | `openssl rand -base64 32` |
 | `AUTH_URL` | yes in production | Public origin, e.g. `https://ccpinvestment.vercel.app` |
+| `ADMIN_SETUP_TOKEN` | first run only | Any long phrase. Lets you create the first super admin at `/admin/setup` (works only while there are no officers). |
 | `SEED_ADMIN_*` | no | Do **not** set or run seed in production |
 
 Apply schema with `npx prisma migrate deploy` (CI or one-off), not `db push`.

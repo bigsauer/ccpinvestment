@@ -58,12 +58,24 @@ model Officer {
   role           OfficerRole
   classYear      String?
   bio            String?
+  /// Optional photo (a path such as /api/photo/<id>); shown on the public Team page.
+  photoUrl       String?
   permissions    String[]     @default([])
+  /// Super admins can invite, edit, deactivate and delete other officers.
+  isSuperAdmin   Boolean      @default(false)
+  /// Deactivated officers cannot sign in; their notes and history stay.
+  active         Boolean      @default(true)
+  /// Set on accounts created with a temporary password; forces a change at first sign-in.
+  mustChangePassword Boolean  @default(false)
+  lastLoginAt    DateTime?
+  failedLogins   Int          @default(0)
+  lockedUntil    DateTime?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   notes          Note[]
   reviewedApps   Application[] @relation("ReviewedBy")
   pageUpdates    PageContent[]
+  invitesSent    Invitation[]
 }
 
 model Member {
@@ -135,7 +147,7 @@ model Application {
   flagged     Boolean           @default(false)
   submittedAt DateTime          @default(now())
   reviewedById String?
-  reviewedBy  Officer?          @relation("ReviewedBy", fields: [reviewedById], references: [id])
+  reviewedBy  Officer?          @relation("ReviewedBy", fields: [reviewedById], references: [id], onDelete: SetNull)
   promotedId  String?
   notes       Note[]
 
@@ -147,8 +159,10 @@ model Note {
   id            String      @id @default(cuid())
   applicationId String
   application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
-  authorId      String
-  author        Officer     @relation(fields: [authorId], references: [id])
+  authorId      String?
+  author        Officer?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  /// Snapshot of the author's name, so a note keeps its byline if the officer is removed.
+  authorName    String      @default("")
   body          String
   createdAt     DateTime    @default(now())
 
@@ -174,7 +188,7 @@ model PageContent {
   status    PageStatus @default(DRAFT)
   updatedAt DateTime   @updatedAt
   updatedById String?
-  updatedBy Officer?   @relation(fields: [updatedById], references: [id])
+  updatedBy Officer?   @relation(fields: [updatedById], references: [id], onDelete: SetNull)
 }
 
 model ClubSettings {
@@ -185,4 +199,64 @@ model ClubSettings {
   meetingLocation  String  @default("Little Theatre")
   meetingTime      String  @default("7:45 AM")
   seasonLabel      String  @default("Spring 2026")
+  /// Headline numbers on the home page, shown as written (e.g. "60+").
+  statMembers      String  @default("60+")
+  statSpeakers     String  @default("12+")
+  statSessions     String  @default("24+")
+  /// Small caption on the home hero photo. Empty hides it.
+  heroCaption      String  @default("")
+  contactEmail     String?
+  instagramUrl     String?
+}
+
+/// Uploaded images (speaker, member and officer photos, meeting photos). Stored in the database so
+/// uploads work on every host, including read-only ones. Served from /api/photo/<id>.
+model Photo {
+  id        String   @id @default(cuid())
+  mime      String
+  data      Bytes
+  size      Int
+  label     String   @default("")
+  createdAt DateTime @default(now())
+}
+
+/// An invitation for someone to create an officer account. Only a hash of the token is stored.
+model Invitation {
+  id          String    @id @default(cuid())
+  email       String
+  name        String    @default("")
+  role        OfficerRole
+  classYear   String?
+  tokenHash   String    @unique
+  invitedById String?
+  invitedBy   Officer?  @relation(fields: [invitedById], references: [id], onDelete: SetNull)
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([email])
+}
+
+enum AccessRequestStatus {
+  PENDING
+  APPROVED
+  DENIED
+}
+
+/// Someone asking for officer access from the public sign-up page. A super admin approves or denies.
+model AccessRequest {
+  id          String              @id @default(cuid())
+  name        String
+  email       String
+  classYear   String?
+  roleWanted  String              @default("")
+  message     String              @default("")
+  status      AccessRequestStatus @default(PENDING)
+  decidedBy   String?
+  decidedAt   DateTime?
+  createdAt   DateTime            @default(now())
+
+  @@index([status])
+  @@index([email])
 }

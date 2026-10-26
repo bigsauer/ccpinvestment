@@ -58,7 +58,13 @@ export default async function TeamPage() {
           <div className="officers">
             {leadership.map((officer) => (
               <div key={officer.id} className="officer">
-                <div className="av">{initials(officer.name)}</div>
+                {localPhoto(officer.photoUrl) ? (
+                  <div className="av av-photo">
+                    <Image src={localPhoto(officer.photoUrl)!} alt={officer.name} fill sizes="64px" />
+                  </div>
+                ) : (
+                  <div className="av">{initials(officer.name)}</div>
+                )}
                 <div className="name">
                   {officer.name}
                   {officer.classYear ? `, '${officer.classYear}` : ""}

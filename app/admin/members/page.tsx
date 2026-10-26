@@ -1,10 +1,30 @@
-import { upsertMember } from "@/lib/actions/admin";
-import { WriteFieldset } from "@/components/admin/WriteGate";
+import Link from "next/link";
 import { Topbar } from "@/components/admin/Topbar";
 import { prisma } from "@/lib/db";
 
-export default async function AdminMembersPage() {
-  const members = await prisma.member.findMany({ orderBy: [{ lastName: "asc" }, { firstName: "asc" }] });
+export default async function AdminMembersPage({ searchParams }: { searchParams: Promise<{ q?: string; show?: string }> }) {
+  const { q = "", show = "all" } = await searchParams;
+  const term = q.trim();
+  const [members, counts] = await Promise.all([
+    prisma.member.findMany({
+      where: {
+        ...(show === "active" ? { status: "ACTIVE" as const } : show === "pending" ? { status: "PENDING" as const } : show === "alum" ? { status: "ALUM" as const } : {}),
+        ...(term
+          ? {
+              OR: [
+                { firstName: { contains: term, mode: "insensitive" as const } },
+                { lastName: { contains: term, mode: "insensitive" as const } },
+                { email: { contains: term, mode: "insensitive" as const } },
+                { gradYear: { contains: term } },
+              ],
+            }
+          : {}),
+      },
+      orderBy: [{ gradYear: "asc" }, { lastName: "asc" }, { firstName: "asc" }],
+    }),
+    prisma.member.groupBy({ by: ["status"], _count: true }),
+  ]);
+  const count = (s: string) => counts.find((c) => c.status === s)?._count ?? 0;
 
   return (
     <>
@@ -15,45 +35,34 @@ export default async function AdminMembersPage() {
             <h1>
               Roster, <span className="serif">kept current.</span>
             </h1>
-            <p className="sub">Approving a student application adds them here as active.</p>
+            <p className="sub">
+              {count("ACTIVE")} active · {count("PENDING")} pending · {count("ALUM")} alumni. Approving a student inquiry adds them here. Members with a photo appear on the public Team page.
+            </p>
+          </div>
+          <div className="r">
+            {/* A file download, so a plain link is right. */}
+            <a href="/admin/export/members" className="btn" download>
+              Export CSV
+            </a>
+            <Link href="/admin/members/new" className="btn red">
+              + Add member
+            </Link>
           </div>
         </div>
 
-        <div className="card" style={{ marginBottom: 20, padding: 20 }}>
-          <form action={upsertMember} className="field-row">
-            <WriteFieldset>
-            <div className="field">
-              <label>First</label>
-              <input name="firstName" required />
-            </div>
-            <div className="field">
-              <label>Last</label>
-              <input name="lastName" required />
-            </div>
-            <div className="field">
-              <label>Email</label>
-              <input name="email" type="email" required />
-            </div>
-            <div className="field">
-              <label>Class</label>
-              <input name="gradYear" required placeholder="2028" />
-            </div>
-            <div className="field">
-              <label>Status</label>
-              <select name="status" defaultValue="ACTIVE">
-                <option value="ACTIVE">Active</option>
-                <option value="PENDING">Pending</option>
-                <option value="ALUM">Alum</option>
-              </select>
-            </div>
-            <div className="field" style={{ display: "flex", alignItems: "end" }}>
-              <button className="btn red" type="submit">
-                Add member
-              </button>
-            </div>
-            </WriteFieldset>
-          </form>
-        </div>
+        <form className="admin-toolbar" method="get">
+          <input className="admin-search" name="q" defaultValue={term} placeholder="Search name, email, class…" />
+          <select name="show" defaultValue={show} className="admin-search" style={{ minWidth: 0 }}>
+            <option value="all">All</option>
+            <option value="active">Active</option>
+            <option value="pending">Pending</option>
+            <option value="alum">Alumni</option>
+          </select>
+          <button className="btn" type="submit">
+            Filter
+          </button>
+          <span className="admin-note grow">{members.length} shown</span>
+        </form>
 
         <div className="card">
           <table className="table">
@@ -63,25 +72,41 @@ export default async function AdminMembersPage() {
                 <th>Email</th>
                 <th>Class</th>
                 <th>Status</th>
-                <th>Role</th>
+                <th>On Team page</th>
+                <th />
               </tr>
             </thead>
             <tbody>
               {members.map((member) => (
                 <tr key={member.id} className="row">
-                  <td className="strong">
-                    {member.firstName} {member.lastName}
-                  </td>
-                  <td>{member.email}</td>
-                  <td>{member.gradYear}</td>
                   <td>
-                    <span className={`pill ${member.status === "ACTIVE" ? "green" : member.status === "ALUM" ? "gray" : "amber"}`}>
-                      {member.status}
-                    </span>
+                    <Link className="tbl-link" href={`/admin/members/${member.id}`}>
+                      {member.firstName} {member.lastName}
+                    </Link>
+                    {member.role ? <div className="row-sub">{member.role}</div> : null}
                   </td>
-                  <td>{member.role ?? "—"}</td>
+                  <td>
+                    {member.email.endsWith(".invalid") ? <span className="pill amber">Email needed</span> : member.email}
+                  </td>
+                  <td>{member.gradYear || "—"}</td>
+                  <td>
+                    <span className={`pill ${member.status === "ACTIVE" ? "green" : member.status === "ALUM" ? "gray" : "amber"}`}>{member.status}</span>
+                  </td>
+                  <td>{member.status === "ACTIVE" && member.photoUrl ? "Yes" : member.photoUrl ? "Photo set (not active)" : "No photo"}</td>
+                  <td className="cell-actions">
+                    <Link className="btn" href={`/admin/members/${member.id}`}>
+                      Edit
+                    </Link>
+                  </td>
                 </tr>
               ))}
+              {members.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="admin-note" style={{ padding: 24 }}>
+                    No members match.
+                  </td>
+                </tr>
+              ) : null}
             </tbody>
           </table>
         </div>

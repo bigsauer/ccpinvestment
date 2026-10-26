@@ -11,7 +11,7 @@ const NAV = [
     section: "Overview",
     items: [
       { href: "/admin", label: "Dashboard", icon: "grid" },
-      { href: "/admin/applications", label: "Applications", icon: "inbox", badgeKey: "apps" as const },
+      { href: "/admin/applications", label: "Inquiries", icon: "inbox", badgeKey: "apps" as const },
     ],
   },
   {
@@ -24,8 +24,12 @@ const NAV = [
     ],
   },
   {
-    section: "System",
-    items: [{ href: "/admin/settings", label: "Settings", icon: "gear" }],
+    section: "Team & system",
+    items: [
+      { href: "/admin/officers", label: "Officers", icon: "shield", badgeKey: "requests" as const },
+      { href: "/admin/activity", label: "Activity log", icon: "clock" },
+      { href: "/admin/settings", label: "Settings", icon: "gear" },
+    ],
   },
 ];
 
@@ -77,6 +81,20 @@ function Icon({ name }: { name: string }) {
           <polyline points="14 2 14 8 20 8" />
         </svg>
       );
+    case "shield":
+      return (
+        <svg {...common}>
+          <path d="M12 3 4 6v6c0 4.5 3.2 8 8 9 4.8-1 8-4.5 8-9V6z" />
+          <path d="m9 12 2 2 4-4" />
+        </svg>
+      );
+    case "clock":
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 7v5l3 2" />
+        </svg>
+      );
     case "gear":
       return (
         <svg {...common}>
@@ -92,12 +110,14 @@ function Icon({ name }: { name: string }) {
 export function Sidebar({
   collapsed,
   openApps,
+  pendingRequests,
   user,
   mobileOpen,
   onCloseMobile,
 }: {
   collapsed: boolean;
   openApps: number;
+  pendingRequests: number;
   user: { name: string; role: string; classYear?: string | null };
   mobileOpen: boolean;
   onCloseMobile: () => void;
@@ -122,7 +142,7 @@ export function Sidebar({
             </div>
           </div>
           <div className="side-mode">
-            <span>Local · v1.0</span>
+            <span>Officer admin</span>
             <span className="dot" />
           </div>
           <button className="side-toggle" type="button" onClick={toggle} aria-label="Collapse sidebar">
@@ -150,6 +170,7 @@ export function Sidebar({
                     </span>
                     <span className="lbl">{item.label}</span>
                     {item.badgeKey === "apps" && openApps > 0 ? <span className="badge">{openApps}</span> : null}
+                    {item.badgeKey === "requests" && pendingRequests > 0 ? <span className="badge">{pendingRequests}</span> : null}
                   </Link>
                 );
               })}
@@ -166,9 +187,12 @@ export function Sidebar({
                 {user.classYear ? ` · '${user.classYear}` : ""}
               </div>
             </div>
+            <Link href="/admin/account" className="more" aria-label="My account" title="My account" onClick={onCloseMobile}>
+              ⚙
+            </Link>
             <form action={logout}>
-              <button type="submit" className="more" aria-label="Sign out">
-                ···
+              <button type="submit" className="more" aria-label="Sign out" title="Sign out">
+                ⎋
               </button>
             </form>
           </div>

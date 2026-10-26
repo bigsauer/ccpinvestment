@@ -16,9 +16,15 @@ export async function getClubSettings() {
       name: "Chaminade Investment Club",
       shortName: "CIC",
       foundedYear: "2024",
-      meetingLocation: "Skip Little Theater",
+      meetingLocation: "ISC",
       meetingTime: "6:45 AM",
       seasonLabel: "Fall 2026",
+      statMembers: "60+",
+      statSpeakers: "12+",
+      statSessions: "24+",
+      heroCaption: "",
+      contactEmail: null as string | null,
+      instagramUrl: null as string | null,
     }
   );
 }
@@ -60,6 +66,7 @@ export async function getSpeakers() {
 
 export async function getPublicOfficers() {
   return prisma.officer.findMany({
+    where: { active: true },
     orderBy: { role: "asc" },
     select: {
       id: true,
@@ -67,6 +74,7 @@ export async function getPublicOfficers() {
       role: true,
       classYear: true,
       bio: true,
+      photoUrl: true,
     },
   });
 }

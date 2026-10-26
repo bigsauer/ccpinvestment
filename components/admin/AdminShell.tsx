@@ -7,12 +7,14 @@ import { WriteProvider } from "@/components/admin/WriteGate";
 export function AdminShell({
   collapsed,
   openApps,
+  pendingRequests,
   writable,
   user,
   children,
 }: {
   collapsed: boolean;
   openApps: number;
+  pendingRequests: number;
   writable: boolean;
   user: { name: string; role: string; classYear?: string | null };
   children: React.ReactNode;
@@ -25,6 +27,7 @@ export function AdminShell({
         <Sidebar
           collapsed={collapsed}
           openApps={openApps}
+          pendingRequests={pendingRequests}
           user={user}
           mobileOpen={mobileOpen}
           onCloseMobile={() => setMobileOpen(false)}
@@ -35,7 +38,7 @@ export function AdminShell({
           </button>
           {writable ? null : (
             <div className="info-note" style={{ margin: "0 20px 0" }}>
-              Advisor session — view only. Mutations are blocked on the server.
+              Advisor session — view only. Changes are blocked on the server.
             </div>
           )}
           {children}

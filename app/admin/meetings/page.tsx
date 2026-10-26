@@ -1,14 +1,18 @@
-import { deleteMeeting, upsertMeeting } from "@/lib/actions/admin";
-import { WriteFieldset } from "@/components/admin/WriteGate";
+import Link from "next/link";
+import { ConfirmAction } from "@/components/admin/ConfirmAction";
 import { Topbar } from "@/components/admin/Topbar";
+import { setMeetingPublished } from "@/lib/actions/admin";
 import { prisma } from "@/lib/db";
 import { displayName } from "@/lib/utils";
 
-export default async function AdminMeetingsPage() {
-  const [meetings, speakers] = await Promise.all([
-    prisma.meeting.findMany({ include: { speaker: true }, orderBy: { date: "desc" } }),
-    prisma.speaker.findMany({ orderBy: { lastName: "asc" } }),
-  ]);
+export default async function AdminMeetingsPage({ searchParams }: { searchParams: Promise<{ show?: string }> }) {
+  const { show = "upcoming" } = await searchParams;
+  const now = new Date();
+  const meetings = await prisma.meeting.findMany({
+    where: show === "past" ? { date: { lt: now } } : show === "all" ? {} : { date: { gte: now } },
+    include: { speaker: true },
+    orderBy: { date: show === "past" || show === "all" ? "desc" : "asc" },
+  });
 
   return (
     <>
@@ -19,62 +23,25 @@ export default async function AdminMeetingsPage() {
             <h1>
               Schedule, <span className="serif">then publish.</span>
             </h1>
-            <p className="sub">RSVP counts are officer-entered. Publishing a row makes it show on the public meetings page.</p>
+            <p className="sub">Only published meetings show on the public site. Times are St. Louis time. RSVP counts are entered by hand.</p>
+          </div>
+          <div className="r">
+            <Link href="/admin/meetings/new" className="btn red">
+              + New meeting
+            </Link>
           </div>
         </div>
 
-        <div className="card" style={{ marginBottom: 20, padding: 20 }}>
-          <form action={upsertMeeting} className="field-row" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
-            <WriteFieldset>
-            <div className="field">
-              <label>Date</label>
-              <input type="datetime-local" name="date" required />
-            </div>
-            <div className="field">
-              <label>Time</label>
-              <input name="time" defaultValue="6:45 AM" />
-            </div>
-            <div className="field">
-              <label>Location</label>
-              <input name="location" defaultValue="Skip Little Theater" />
-            </div>
-            <div className="field">
-              <label>Speaker</label>
-              <select name="speakerId" defaultValue="">
-                <option value="">None</option>
-                {speakers.map((speaker) => (
-                  <option key={speaker.id} value={speaker.id}>
-                    {displayName(speaker.firstName, speaker.lastName)}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="field">
-              <label>Topic</label>
-              <input name="topic" />
-            </div>
-            <div className="field">
-              <label>Status</label>
-              <select name="status" defaultValue="TENTATIVE">
-                <option value="CONFIRMED">Confirmed</option>
-                <option value="TENTATIVE">Tentative</option>
-                <option value="OPEN">Open</option>
-              </select>
-            </div>
-            <div className="field">
-              <label>RSVPs</label>
-              <input name="rsvpCount" type="number" defaultValue={0} />
-            </div>
-            <div className="field" style={{ display: "flex", alignItems: "end", gap: 10 }}>
-              <label>
-                <input type="checkbox" name="published" /> Published
-              </label>
-              <button className="btn red" type="submit">
-                Add meeting
-              </button>
-            </div>
-            </WriteFieldset>
-          </form>
+        <div className="tab-strip">
+          {[
+            ["upcoming", "Upcoming"],
+            ["past", "Past"],
+            ["all", "All"],
+          ].map(([key, label]) => (
+            <Link key={key} href={`/admin/meetings?show=${key}`} className={show === key ? "t on" : "t"}>
+              {label}
+            </Link>
+          ))}
         </div>
 
         <div className="card">
@@ -82,41 +49,50 @@ export default async function AdminMeetingsPage() {
             <thead>
               <tr>
                 <th>Date</th>
-                <th>Speaker</th>
-                <th>Topic</th>
+                <th>Session</th>
                 <th>Status</th>
                 <th>RSVP</th>
-                <th>Live</th>
+                <th>On site</th>
                 <th />
               </tr>
             </thead>
             <tbody>
               {meetings.map((meeting) => (
                 <tr key={meeting.id} className="row">
-                  <td className="strong">{meeting.date.toLocaleDateString("en-US", { timeZone: "America/Chicago" })}</td>
                   <td>
-                    {meeting.speaker ? displayName(meeting.speaker.firstName, meeting.speaker.lastName) : "—"}
-                    <div className="sub">{meeting.time}</div>
+                    <Link className="tbl-link" href={`/admin/meetings/${meeting.id}`}>
+                      {meeting.date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric", timeZone: "America/Chicago" })}
+                    </Link>
+                    <div className="row-sub">
+                      {meeting.time} · {meeting.location}
+                    </div>
                   </td>
-                  <td>{meeting.topic || "—"}</td>
                   <td>
-                    <span className={`pill ${meeting.status === "CONFIRMED" ? "green" : meeting.status === "TENTATIVE" ? "amber" : "gray"}`}>
-                      {meeting.status}
-                    </span>
+                    {meeting.speaker ? displayName(meeting.speaker.firstName, meeting.speaker.lastName) : meeting.topic || meeting.format}
+                    {meeting.speaker && meeting.topic ? <div className="row-sub">{meeting.topic}</div> : null}
+                  </td>
+                  <td>
+                    <span className={`pill ${meeting.status === "CONFIRMED" ? "green" : meeting.status === "TENTATIVE" ? "amber" : "gray"}`}>{meeting.status}</span>
                   </td>
                   <td>{meeting.rsvpCount}</td>
-                  <td>{meeting.published ? "Yes" : "No"}</td>
+                  <td>{meeting.published ? <span className="pill green">Published</span> : <span className="pill gray">Hidden</span>}</td>
                   <td className="cell-actions">
-                    <form action={deleteMeeting.bind(null, meeting.id)}>
-                      <WriteFieldset>
-                        <button className="btn" type="submit">
-                          Delete
-                        </button>
-                      </WriteFieldset>
-                    </form>
+                    <ConfirmAction action={setMeetingPublished.bind(null, meeting.id, !meeting.published)}>
+                      {meeting.published ? "Unpublish" : "Publish"}
+                    </ConfirmAction>{" "}
+                    <Link className="btn" href={`/admin/meetings/${meeting.id}`}>
+                      Edit
+                    </Link>
                   </td>
                 </tr>
               ))}
+              {meetings.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="admin-note" style={{ padding: 24 }}>
+                    Nothing here. Use “New meeting” to schedule one.
+                  </td>
+                </tr>
+              ) : null}
             </tbody>
           </table>
         </div>

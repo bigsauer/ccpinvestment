@@ -1,12 +1,19 @@
 "use client";
 
 import { useActionState } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { login } from "@/lib/actions/auth";
 
 export function LoginForm() {
   const [state, action, pending] = useActionState(login, {});
-  const callbackUrl = useSearchParams().get("callbackUrl") ?? "/admin";
+  const params = useSearchParams();
+  const callbackUrl = params.get("callbackUrl") ?? "/admin";
+  const notice = params.get("welcome")
+    ? "Your account is ready. Sign in below."
+    : params.get("reason") === "ended"
+      ? "That account was removed or switched off, so you were signed out."
+      : null;
 
   return (
     <div className="login-wrap">
@@ -24,13 +31,17 @@ export function LoginForm() {
           <label htmlFor="password">Password</label>
           <input id="password" name="password" type="password" required autoComplete="current-password" />
         </div>
+        {notice ? <div className="ok-msg show"><span>✓</span> {notice}</div> : null}
         {state.error ? <div className="info-note">{state.error}</div> : null}
         <div className="form-foot">
-          <div className="note">Officer accounts only</div>
+          <div className="note">
+            Officer accounts only · <Link href="/admin/signup">Request access</Link>
+          </div>
           <button className="btn red lg" type="submit" disabled={pending}>
             {pending ? "Signing in…" : "Sign in"}
           </button>
         </div>
+        <p className="field-help" style={{ marginTop: 12 }}>After five wrong passwords an account locks for 15 minutes.</p>
       </form>
     </div>
   );

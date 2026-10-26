@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export function Topbar({
   crumbs,
-  searchPlaceholder = "Search applications, speakers, meetings…",
+  searchPlaceholder = "Search speakers, members, inquiries, meetings…",
   actions,
 }: {
   crumbs: string[];
@@ -20,17 +20,16 @@ export function Topbar({
           </span>
         ))}
       </div>
-      <div className="search">
-        <input type="search" placeholder={searchPlaceholder} />
-        <span className="kbd">⌘K</span>
-      </div>
+      <form className="search" action="/admin/search" method="get" role="search">
+        <input type="search" name="q" placeholder={searchPlaceholder} aria-label="Search the admin" />
+      </form>
       <div className="actions">
         {actions ?? (
           <>
             <Link href="/" className="btn ghost" target="_blank">
               View site
             </Link>
-            <Link href="/admin/meetings" className="btn red">
+            <Link href="/admin/meetings/new" className="btn red">
               + New meeting
             </Link>
           </>

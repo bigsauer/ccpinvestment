@@ -73,6 +73,11 @@ export function JoinForm() {
         <label htmlFor="why">Why are you interested?</label>
         <textarea id="why" name="why" placeholder="One or two sentences." disabled={state.ok} />
       </div>
+      {/* Honeypot: hidden from people, tempting to bots. */}
+      <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", height: 0, overflow: "hidden" }}>
+        <label htmlFor="website-hp">Leave this empty</label>
+        <input id="website-hp" name="website" tabIndex={-1} autoComplete="off" />
+      </div>
       <div className="form-foot">
         <div className="note">
           <span style={{ width: 6, height: 6, borderRadius: 999, background: "var(--green)", display: "inline-block" }} />

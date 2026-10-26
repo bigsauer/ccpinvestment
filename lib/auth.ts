@@ -22,10 +22,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!email || !password) return null;
 
         const officer = await prisma.officer.findUnique({ where: { email } });
-        if (!officer) return null;
+        if (!officer || !officer.active) return null;
+        if (officer.lockedUntil && officer.lockedUntil > new Date()) return null;
 
         const ok = await compare(password, officer.passwordHash);
-        if (!ok) return null;
+        if (!ok) {
+          // Five wrong passwords in a row lock the account for 15 minutes.
+          const failed = officer.failedLogins + 1;
+          await prisma.officer.update({
+            where: { id: officer.id },
+            data: failed >= 5
+              ? { failedLogins: 0, lockedUntil: new Date(Date.now() + 15 * 60 * 1000) }
+              : { failedLogins: failed },
+          });
+          return null;
+        }
+        await prisma.officer.update({
+          where: { id: officer.id },
+          data: { failedLogins: 0, lockedUntil: null, lastLoginAt: new Date() },
+        });
 
         return {
           id: officer.id,

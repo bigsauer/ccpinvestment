@@ -2,7 +2,9 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { addApplicationNote, setApplicationStatus, toggleApplicationFlag } from "@/lib/actions/admin";
+import Link from "next/link";
+import { addApplicationNote, deleteApplication, setApplicationStatus, toggleApplicationFlag } from "@/lib/actions/admin";
+import type { FormState } from "@/lib/form-state";
 import { useCanWrite } from "@/components/admin/WriteGate";
 import { avatarTone, initials, relativeWhen } from "@/lib/utils";
 
@@ -11,6 +13,7 @@ type AppRow = {
   type: "STUDENT" | "SPEAKER";
   status: "NEW" | "REVIEWING" | "APPROVED" | "REJECTED" | "ARCHIVED";
   flagged: boolean;
+  promotedId: string | null;
   submittedAt: string;
   payload: Record<string, string>;
   notes: { id: string; body: string; createdAt: string; author: string }[];
@@ -19,12 +22,46 @@ type AppRow = {
 type Tab = "all" | "students" | "speakers" | "archived";
 type Filter = "all" | "unread" | "flagged" | "approved";
 
-export function Inbox({ applications }: { applications: AppRow[] }) {
+const LABELS: Record<string, string> = {
+  firstName: "First name",
+  lastName: "Last name",
+  email: "Email",
+  phone: "Phone",
+  gradYear: "Class of",
+  interest: "Interest",
+  linkedin: "LinkedIn",
+  city: "City",
+  firm: "Firm",
+  title: "Title",
+  industry: "Industry",
+  years: "Years in industry",
+  connection: "Connection to the club",
+  topics: "Topics",
+  sessionTitle: "Working title",
+  dates: "Dates that work",
+  format: "Format",
+  notes: "Notes",
+  why: "Why interested",
+  abstract: "What they'd cover",
+};
+const HIDDEN_FROM_LIST = new Set(["abstract", "why"]);
+
+function replyLink(app: AppRow) {
+  const email = app.payload.email;
+  if (!email) return null;
+  const first = app.payload.firstName || "there";
+  const subject = app.type === "SPEAKER" ? "Speaking to the Chaminade Investment Club" : "Your Chaminade Investment Club application";
+  const body = `Hi ${first},\n\n`;
+  return `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+export function Inbox({ applications, initialId }: { applications: AppRow[]; initialId?: string }) {
   const router = useRouter();
   const writable = useCanWrite();
   const [tab, setTab] = useState<Tab>("all");
   const [filter, setFilter] = useState<Filter>("all");
-  const [selectedId, setSelectedId] = useState(applications[0]?.id ?? null);
+  const [selectedId, setSelectedId] = useState(applications.find((a) => a.id === initialId)?.id ?? applications[0]?.id ?? null);
+  const [query, setQuery] = useState("");
   const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
@@ -39,7 +76,9 @@ export function Inbox({ applications }: { applications: AppRow[] }) {
     [applications],
   );
 
+  const needle = query.trim().toLowerCase();
   const list = applications.filter((app) => {
+    if (needle && !Object.values(app.payload).join(" ").toLowerCase().includes(needle)) return false;
     if (tab === "archived") return app.status === "ARCHIVED";
     if (app.status === "ARCHIVED") return false;
     if (tab === "students") return app.type === "STUDENT";
@@ -52,14 +91,14 @@ export function Inbox({ applications }: { applications: AppRow[] }) {
 
   const selected = applications.find((app) => app.id === selectedId) ?? list[0] ?? null;
 
-  const run = (fn: () => Promise<{ ok: true } | { ok: false; error: string }>) => {
+  const run = (fn: () => Promise<FormState>) => {
     start(async () => {
       const result = await fn();
       if (result.ok) {
         setError(null);
         router.refresh();
       } else {
-        setError(result.error);
+        setError(result.error ?? "Something went wrong");
       }
     });
   };
@@ -86,6 +125,17 @@ export function Inbox({ applications }: { applications: AppRow[] }) {
           <div className="inbox-list-head">
             <div className="h">{list.length} applications</div>
             <div className="desc">Newest</div>
+          </div>
+          <div style={{ padding: "0 14px 10px" }}>
+            <input
+              className="admin-search"
+              style={{ width: "100%", minWidth: 0 }}
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search these inquiries…"
+              aria-label="Search inquiries"
+            />
           </div>
           <div className="inbox-filter">
             {(["all", "unread", "flagged", "approved"] as const).map((key) => (
@@ -143,44 +193,48 @@ export function Inbox({ applications }: { applications: AppRow[] }) {
               </div>
               {writable ? (
                 <div className="actions">
-                  <button
-                    className="btn"
-                    disabled={pending}
-                    onClick={() => run(() => toggleApplicationFlag(selected.id))}
-                  >
+                  {replyLink(selected) ? (
+                    <a className="btn" href={replyLink(selected)!}>
+                      Reply by email
+                    </a>
+                  ) : null}
+                  <button className="btn" disabled={pending} onClick={() => run(() => toggleApplicationFlag(selected.id))}>
                     {selected.flagged ? "Unflag" : "Flag"}
                   </button>
+                  {selected.status === "NEW" ? (
+                    <button className="btn" disabled={pending} onClick={() => run(() => setApplicationStatus(selected.id, "REVIEWING"))}>
+                      Mark reviewing
+                    </button>
+                  ) : null}
+                  {selected.status === "ARCHIVED" || selected.status === "REJECTED" ? (
+                    <button className="btn" disabled={pending} onClick={() => run(() => setApplicationStatus(selected.id, "NEW"))}>
+                      Reopen
+                    </button>
+                  ) : null}
                   {selected.status !== "ARCHIVED" ? (
-                    <button
-                      className="btn"
-                      disabled={pending}
-                      onClick={() => run(() => setApplicationStatus(selected.id, "ARCHIVED"))}
-                    >
+                    <button className="btn" disabled={pending} onClick={() => run(() => setApplicationStatus(selected.id, "ARCHIVED"))}>
                       Archive
                     </button>
                   ) : null}
-                  {selected.status === "NEW" ? (
-                    <button
-                      className="btn"
-                      disabled={pending}
-                      onClick={() => run(() => setApplicationStatus(selected.id, "REVIEWING"))}
-                    >
-                      Review
+                  {selected.status !== "REJECTED" && selected.status !== "APPROVED" ? (
+                    <button className="btn" disabled={pending} onClick={() => run(() => setApplicationStatus(selected.id, "REJECTED"))}>
+                      Decline
+                    </button>
+                  ) : null}
+                  {selected.status !== "APPROVED" ? (
+                    <button className="btn red" disabled={pending} onClick={() => run(() => setApplicationStatus(selected.id, "APPROVED"))}>
+                      Approve
                     </button>
                   ) : null}
                   <button
-                    className="btn"
+                    className="btn danger"
                     disabled={pending}
-                    onClick={() => run(() => setApplicationStatus(selected.id, "REJECTED"))}
+                    onClick={() => {
+                      if (!window.confirm("Delete this inquiry for good? Notes go with it.")) return;
+                      run(() => deleteApplication(selected.id));
+                    }}
                   >
-                    Reject
-                  </button>
-                  <button
-                    className="btn red"
-                    disabled={pending}
-                    onClick={() => run(() => setApplicationStatus(selected.id, "APPROVED"))}
-                  >
-                    Approve
+                    Delete
                   </button>
                 </div>
               ) : (
@@ -191,20 +245,49 @@ export function Inbox({ applications }: { applications: AppRow[] }) {
             </div>
             <div className="inbox-detail-body">
               {error ? <div className="info-note">{error}</div> : null}
+              {selected.status === "APPROVED" && selected.promotedId ? (
+                <div className="ok-msg show" style={{ marginBottom: 14 }}>
+                  <span>✓</span>
+                  <span>
+                    Approved and added.{" "}
+                    <Link href={selected.type === "SPEAKER" ? `/admin/speakers/${selected.promotedId}` : `/admin/members/${selected.promotedId}`}>
+                      {selected.type === "SPEAKER" ? "Finish their speaker profile →" : "Open their member record →"}
+                    </Link>
+                  </span>
+                </div>
+              ) : null}
               <div className="inbox-detail-section">
                 <div className="h">About</div>
                 <div className="kv-grid">
-                  {Object.entries(selected.payload).map(([key, value]) => (
-                    <div key={key} style={{ display: "contents" }}>
-                      <div className="k">{key}</div>
-                      <div className="v">{value || "—"}</div>
-                    </div>
-                  ))}
+                  {Object.entries(selected.payload)
+                    .filter(([key, value]) => !HIDDEN_FROM_LIST.has(key) && key !== "firstName" && key !== "lastName" && value !== "")
+                    .sort(([a], [b]) => {
+                      const order = Object.keys(LABELS);
+                      const ai = order.indexOf(a);
+                      const bi = order.indexOf(b);
+                      return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+                    })
+                    .map(([key, value]) => (
+                      <div key={key} style={{ display: "contents" }}>
+                        <div className="k">{LABELS[key] ?? key}</div>
+                        <div className="v">
+                          {key === "email" ? (
+                            <a href={`mailto:${value}`}>{value}</a>
+                          ) : key === "linkedin" && /^https?:\/\//.test(value) ? (
+                            <a href={value} target="_blank" rel="noopener noreferrer">
+                              {value.replace(/^https?:\/\/(www\.)?/, "")}
+                            </a>
+                          ) : (
+                            value
+                          )}
+                        </div>
+                      </div>
+                    ))}
                 </div>
               </div>
               {selected.payload.abstract || selected.payload.why ? (
                 <div className="inbox-detail-section">
-                  <div className="h">Note</div>
+                  <div className="h">{selected.payload.abstract ? "What they would cover" : "Why they want to join"}</div>
                   <div className="quote">{selected.payload.abstract || selected.payload.why}</div>
                 </div>
               ) : null}

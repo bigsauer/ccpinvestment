@@ -9,6 +9,23 @@ export type FormState = {
   error?: string;
 };
 
+/**
+ * Light spam protection for the public forms, with no captcha to bother real people.
+ * Returns "skip" for bots and repeat sends (shown as success so they learn nothing), or "go" to save it.
+ */
+async function screen(formData: FormData, type: "STUDENT" | "SPEAKER", email: string): Promise<"go" | "skip"> {
+  if (String(formData.get("website") ?? "").trim()) return "skip"; // honeypot field real people never see
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 200) throw new Error("Please enter a valid email address.");
+  const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+  if ((await prisma.application.count({ where: { submittedAt: { gte: tenMinutesAgo } } })) >= 25) {
+    throw new Error("We are getting a lot of submissions right now. Please try again in a few minutes.");
+  }
+  const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const recent = await prisma.application.findMany({ where: { type, submittedAt: { gte: dayAgo } }, select: { payload: true } });
+  const duplicate = recent.some((app) => String(((app.payload ?? {}) as Record<string, unknown>).email ?? "").toLowerCase() === email);
+  return duplicate ? "skip" : "go";
+}
+
 function required(value: FormDataEntryValue | null, label: string) {
   const text = String(value ?? "").trim();
   if (!text) throw new Error(`${label} is required`);
@@ -25,7 +42,8 @@ export async function submitStudentApplication(
     const email = required(formData.get("email"), "School email").toLowerCase();
     const gradYear = required(formData.get("grade"), "Class of");
     const interest = String(formData.get("interest") ?? "Regular member");
-    const why = String(formData.get("why") ?? "").trim();
+    const why = String(formData.get("why") ?? "").trim().slice(0, 3000);
+    if ((await screen(formData, "STUDENT", email)) === "skip") return { ok: true };
 
     await prisma.application.create({
       data: {
@@ -75,6 +93,7 @@ export async function submitSpeakerApplication(
     const abstract = required(formData.get("abstract"), "What you'd cover");
     const dates = String(formData.get("dates") ?? "").trim();
     const notes = String(formData.get("notes") ?? "").trim();
+    if ((await screen(formData, "SPEAKER", email)) === "skip") return { ok: true };
 
     await prisma.application.create({
       data: {

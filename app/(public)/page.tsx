@@ -105,9 +105,11 @@ export default async function HomePage() {
               </Link>
             </div>
           </div>
-          <div className="hero-caption">
-            <span className="mono">04/16/26 · Spring session, Little Theatre</span>
-          </div>
+          {settings.heroCaption ? (
+            <div className="hero-caption">
+              <span className="mono">{settings.heroCaption}</span>
+            </div>
+          ) : null}
         </div>
       </header>
 
@@ -136,21 +138,21 @@ export default async function HomePage() {
           <div className="stat">
             <div className="k">Members</div>
             <div className="v mono">
-              <CountUp value="60+" />
+              <CountUp value={settings.statMembers} />
             </div>
             <div className="d">Across all grades</div>
           </div>
           <div className="stat">
             <div className="k">Guest speakers</div>
             <div className="v mono">
-              <CountUp value="12+" delay={140} />
+              <CountUp value={settings.statSpeakers} delay={140} />
             </div>
             <div className="d">Since founding</div>
           </div>
           <div className="stat">
             <div className="k">Sessions held</div>
             <div className="v mono">
-              <CountUp value="24+" delay={280} />
+              <CountUp value={settings.statSessions} delay={280} />
             </div>
             <div className="d">2024 → present</div>
           </div>

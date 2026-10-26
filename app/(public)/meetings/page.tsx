@@ -17,7 +17,7 @@ import {
   type UpcomingMeeting,
 } from "@/components/public/UpcomingCard";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { getLivePageBlocks, getPastMeetings, getSpeakers, getUpcomingMeetings } from "@/lib/queries";
+import { getClubSettings, getLivePageBlocks, getPastMeetings, getSpeakers, getUpcomingMeetings } from "@/lib/queries";
 import { SCHOOL_ADDRESS, SITE, absoluteUrl, pageMeta, speakerSlug } from "@/lib/site";
 import { dayNumber, displayName, monthName, weekdayName } from "@/lib/utils";
 
@@ -30,11 +30,12 @@ export const metadata: Metadata = pageMeta({
 export const revalidate = 60;
 
 export default async function MeetingsPage() {
-  const [upcoming, pastMeetings, blocks, speakers] = await Promise.all([
+  const [upcoming, pastMeetings, blocks, speakers, settings] = await Promise.all([
     getUpcomingMeetings(),
     getPastMeetings(),
     getLivePageBlocks("meetings"),
     getSpeakers(),
+    getClubSettings(),
   ]);
   // Past sessions come from logged meetings; until officers log those, the speaker archive fills in.
   const past: Array<{ key: string; href: string; photo: string | null; date: Date; title: string; sub: string }> =
@@ -103,7 +104,7 @@ export default async function MeetingsPage() {
         <div className="wrap pb-content">
           <PageBannerCopy
             blocks={blocks}
-            crumbs="Meetings · Fall 2026"
+            crumbs={`Meetings · ${settings.seasonLabel}`}
             lede="Meeting cadence varies — we schedule around speaker availability. Every session lists date, time, the guest speaker, and a short background on their firm and role."
           >
             Schedule &amp; <span className="serif">upcoming sessions.</span>
