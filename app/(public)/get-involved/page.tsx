@@ -3,7 +3,8 @@ import { Suspense } from "react";
 import { GetInvolved } from "@/components/public/GetInvolved";
 import { PageBannerCopy } from "@/components/public/PageBannerCopy";
 import { PublicNav } from "@/components/public/Nav";
-import { getLivePageBlocks } from "@/lib/queries";
+import { classYearList } from "@/lib/class-years";
+import { getClubSettings, getLivePageBlocks } from "@/lib/queries";
 import { pageMeta } from "@/lib/site";
 
 export const metadata: Metadata = pageMeta({
@@ -14,7 +15,7 @@ export const metadata: Metadata = pageMeta({
 });
 
 export default async function GetInvolvedPage() {
-  const blocks = await getLivePageBlocks("get-involved");
+  const [blocks, settings] = await Promise.all([getLivePageBlocks("get-involved"), getClubSettings()]);
 
   return (
     <>
@@ -32,7 +33,7 @@ export default async function GetInvolvedPage() {
         </div>
       </header>
       <Suspense fallback={<div className="wrap" style={{ padding: "48px 0", minHeight: 1400 }}>Loading forms…</div>}>
-        <GetInvolved />
+        <GetInvolved classYears={classYearList(settings.classYearFrom, settings.classYearTo)} />
       </Suspense>
       </main>
     </>

@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { PublicNav } from "@/components/public/Nav";
 import { PageBannerCopy } from "@/components/public/PageBannerCopy";
-import { getLivePageBlocks, getPublicMembers, getPublicOfficers } from "@/lib/queries";
+import { getLivePageBlocks, getPublicMembers, getPublicOfficers, getSiteImages } from "@/lib/queries";
 import { localPhoto } from "@/lib/speakers";
 import { pageMeta } from "@/lib/site";
 import { initials, roleLabel } from "@/lib/utils";
@@ -17,10 +17,11 @@ export const metadata: Metadata = pageMeta({
 export const revalidate = 60;
 
 export default async function TeamPage() {
-  const [officers, blocks, members] = await Promise.all([
+  const [officers, blocks, members, images] = await Promise.all([
     getPublicOfficers(),
     getLivePageBlocks("team"),
     getPublicMembers(),
+    getSiteImages(),
   ]);
   const leadership = officers.filter((officer) => officer.role !== "ADVISOR");
   const advisor = officers.find((officer) => officer.role === "ADVISOR");
@@ -30,7 +31,7 @@ export default async function TeamPage() {
       <PublicNav />
       <main>
       <header className="page-banner">
-        <Image className="pb-img" src="/photos/session-06.jpg" alt="Chaminade Investment Club meeting" fill priority sizes="100vw" />
+        <Image className="pb-img" src={images["team-banner"].src} alt={images["team-banner"].alt} style={images["team-banner"].style} fill priority sizes="100vw" />
         <div className="pb-overlay" />
         <div className="wrap pb-content">
           <PageBannerCopy

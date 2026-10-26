@@ -9,7 +9,7 @@ import { SITE, absoluteUrl } from "@/lib/site";
 
 type Tab = "students" | "speakers";
 
-export function GetInvolved() {
+export function GetInvolved({ classYears }: { classYears: string[] }) {
   const params = useSearchParams();
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("students");
@@ -95,7 +95,7 @@ export function GetInvolved() {
                   />
                 </div>
               </div>
-              <JoinForm />
+              <JoinForm classYears={classYears} />
             </div>
           ) : (
             <div className="speak-wrap speak-solo">

@@ -73,6 +73,20 @@ export default async function SettingsPage({ params }: { params: Promise<{ secti
                       <input name="seasonLabel" defaultValue={settings.seasonLabel} placeholder="Fall 2026" />
                       <div className="field-help">Shown on the home page and the Meetings page.</div>
                     </div>
+                    <div className="group-h" style={{ margin: "6px 0 8px" }}>Join form</div>
+                    <div className="field-row">
+                      <div className="field">
+                        <label>First class year offered</label>
+                        <input name="classYearFrom" type="number" min={2000} max={2100} defaultValue={settings.classYearFrom} />
+                      </div>
+                      <div className="field">
+                        <label>Last class year offered</label>
+                        <input name="classYearTo" type="number" min={2000} max={2100} defaultValue={settings.classYearTo} />
+                      </div>
+                    </div>
+                    <div className="field-help" style={{ marginBottom: 14 }}>
+                      Students pick their “Class of” from this range on the join form. Move the first year up each fall when a class graduates.
+                    </div>
                     <HiddenSiteFields settings={settings} />
                   </>
                 ) : (
@@ -169,6 +183,8 @@ function GeneralHidden({ settings }: { settings: Settings }) {
       <input type="hidden" name="meetingLocation" value={settings.meetingLocation} />
       <input type="hidden" name="meetingTime" value={settings.meetingTime} />
       <input type="hidden" name="seasonLabel" value={settings.seasonLabel} />
+      <input type="hidden" name="classYearFrom" value={settings.classYearFrom} />
+      <input type="hidden" name="classYearTo" value={settings.classYearTo} />
     </>
   );
 }

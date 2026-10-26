@@ -7,6 +7,7 @@ import type { FormState } from "@/lib/form-state";
 import { logActivity, requireWriter } from "@/lib/guard";
 import { safeHttpUrl } from "@/lib/safe-url";
 import { EDITABLE_PAGES } from "@/lib/site-pages";
+import { slotDef } from "@/lib/site-images";
 import { parseHighlights } from "@/lib/speakers";
 import { done, fail, localPhotoPath, revalidateAdmin, revalidatePublic, str } from "@/lib/actions/util";
 
@@ -398,7 +399,16 @@ export async function saveClubSettings(_prev: FormState, formData: FormData): Pr
     if (instagramRaw && !instagramUrl) throw new Error("The Instagram link must start with http:// or https://");
     const contactEmail = str(formData, "contactEmail");
     if (contactEmail && !contactEmail.includes("@")) throw new Error("That contact email does not look right");
+    const classYearFrom = Number(str(formData, "classYearFrom") || 2027);
+    const classYearTo = Number(str(formData, "classYearTo") || 2035);
+    if (![classYearFrom, classYearTo].every((y) => Number.isInteger(y) && y >= 2000 && y <= 2100)) {
+      throw new Error("Class years must be four-digit years, like 2027.");
+    }
+    if (classYearFrom > classYearTo) throw new Error("The first class year must not be after the last one.");
+    if (classYearTo - classYearFrom > 14) throw new Error("Offer at most 15 class years.");
     const data = {
+      classYearFrom,
+      classYearTo,
       name: str(formData, "name") || "Chaminade Investment Club",
       shortName: str(formData, "shortName") || "CIC",
       foundedYear: str(formData, "foundedYear") || "2024",
@@ -417,6 +427,51 @@ export async function saveClubSettings(_prev: FormState, formData: FormData): Pr
     revalidateAdmin();
     revalidatePublic();
     return done("Settings saved");
+  } catch (error) {
+    return fail(error);
+  }
+}
+
+/* ───────────── Website photos ───────────── */
+
+export async function saveSiteImage(_prev: FormState, formData: FormData): Promise<FormState> {
+  try {
+    const user = await requireWriter();
+    const def = slotDef(str(formData, "slot"));
+    if (!def) throw new Error("Unknown photo");
+    const photoUrl = localPhotoPath(str(formData, "photoUrl"));
+    if (!photoUrl) throw new Error("Choose a photo first.");
+    const clamp = (raw: string, fallback: number) => {
+      const n = Math.round(Number(raw));
+      return Number.isFinite(n) ? Math.min(100, Math.max(0, n)) : fallback;
+    };
+    const data = {
+      photoUrl,
+      focusX: clamp(str(formData, "focusX"), 50),
+      focusY: clamp(str(formData, "focusY"), 50),
+      alt: str(formData, "alt").slice(0, 200),
+      updatedBy: user.name,
+    };
+    await prisma.siteImage.upsert({ where: { slot: def.slot }, create: { slot: def.slot, ...data }, update: data });
+    await logActivity(user, `Website photo updated — ${def.label}`, "SiteImage", def.slot);
+    revalidateAdmin();
+    revalidatePublic();
+    return done("Published. It shows on the site within a minute.");
+  } catch (error) {
+    return fail(error);
+  }
+}
+
+export async function resetSiteImage(slot: string): Promise<FormState> {
+  try {
+    const user = await requireWriter();
+    const def = slotDef(slot);
+    if (!def) throw new Error("Unknown photo");
+    await prisma.siteImage.deleteMany({ where: { slot } });
+    await logActivity(user, `Website photo put back to the original — ${def.label}`, "SiteImage", slot);
+    revalidateAdmin();
+    revalidatePublic();
+    return { ok: true };
   } catch (error) {
     return fail(error);
   }
@@ -441,14 +496,15 @@ export async function purgeApplications(_prev: FormState, formData: FormData): P
 export async function cleanupPhotos(): Promise<FormState> {
   try {
     const user = await requireWriter();
-    const [speakers, members, officers, meetings] = await Promise.all([
+    const [speakers, members, officers, meetings, siteImages] = await Promise.all([
       prisma.speaker.findMany({ select: { photoUrl: true } }),
       prisma.member.findMany({ select: { photoUrl: true } }),
       prisma.officer.findMany({ select: { photoUrl: true } }),
       prisma.meeting.findMany({ select: { photoUrl: true } }),
+      prisma.siteImage.findMany({ select: { photoUrl: true } }),
     ]);
     const used = new Set<string>();
-    for (const row of [...speakers, ...members, ...officers, ...meetings]) {
+    for (const row of [...speakers, ...members, ...officers, ...meetings, ...siteImages]) {
       const match = row.photoUrl?.match(/^\/api\/photo\/([A-Za-z0-9]+)$/);
       if (match) used.add(match[1]!);
     }

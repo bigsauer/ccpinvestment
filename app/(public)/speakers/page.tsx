@@ -4,7 +4,7 @@ import { PublicNav } from "@/components/public/Nav";
 import { PageBannerCopy } from "@/components/public/PageBannerCopy";
 import { SpeakerArchive } from "@/components/public/SpeakerFilters";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { getLivePageBlocks, getSpeakers } from "@/lib/queries";
+import { getLivePageBlocks, getSiteImages, getSpeakers } from "@/lib/queries";
 import { SITE, absoluteUrl, pageMeta, speakerSlug } from "@/lib/site";
 import { parseHighlights } from "@/lib/speakers";
 
@@ -17,7 +17,7 @@ export const metadata: Metadata = pageMeta({
 export const revalidate = 60;
 
 export default async function SpeakersPage() {
-  const [speakers, blocks] = await Promise.all([getSpeakers(), getLivePageBlocks("speakers")]);
+  const [speakers, blocks, images] = await Promise.all([getSpeakers(), getLivePageBlocks("speakers"), getSiteImages()]);
 
   return (
     <>
@@ -41,7 +41,7 @@ export default async function SpeakersPage() {
       <PublicNav />
       <main>
       <header className="page-banner">
-        <Image className="pb-img" src="/photos/session-05.jpg" alt="Chaminade Investment Club meeting" fill priority sizes="100vw" />
+        <Image className="pb-img" src={images["speakers-banner"].src} alt={images["speakers-banner"].alt} style={images["speakers-banner"].style} fill priority sizes="100vw" />
         <div className="pb-overlay" />
         <div className="wrap pb-content">
           <PageBannerCopy

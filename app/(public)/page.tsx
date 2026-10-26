@@ -3,7 +3,7 @@ import Link from "next/link";
 import { CountUp } from "@/components/public/CountUp";
 import { PublicNav } from "@/components/public/Nav";
 import { pageText } from "@/lib/copy";
-import { getClubSettings, getLivePageBlocks, getNextMeeting } from "@/lib/queries";
+import { getClubSettings, getLivePageBlocks, getNextMeeting, getSiteImages } from "@/lib/queries";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { SCHOOL_ADDRESS, SITE, absoluteUrl } from "@/lib/site";
 import { formatShortDate } from "@/lib/utils";
@@ -11,10 +11,11 @@ import { formatShortDate } from "@/lib/utils";
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const [settings, next, blocks] = await Promise.all([
+  const [settings, next, blocks, images] = await Promise.all([
     getClubSettings(),
     getNextMeeting(),
     getLivePageBlocks("home"),
+    getSiteImages(),
   ]);
   const nextLabel = next
     ? `NEXT SESSION · ${formatShortDate(next.date).toUpperCase()}`
@@ -56,8 +57,9 @@ export default async function HomePage() {
         <div className="hero-photo-inner">
           <Image
             className="hero-bg"
-            src="/photos/session-02.jpg"
-            alt="A Chaminade Investment Club meeting in session"
+            src={images["home-hero"].src}
+            alt={images["home-hero"].alt}
+            style={images["home-hero"].style}
             fill
             priority
             sizes="100vw"
@@ -205,7 +207,7 @@ export default async function HomePage() {
       <section className="section">
         <div className="wrap pitch">
           <div className="ph">
-            <Image src="/photos/session-07.jpg" alt="A Chaminade Investment Club meeting in progress" fill sizes="(max-width: 900px) 100vw, 50vw" />
+            <Image src={images["home-inside"].src} alt={images["home-inside"].alt} style={images["home-inside"].style} fill sizes="(max-width: 900px) 100vw, 50vw" />
           </div>
           <div>
             <div className="section-label">Inside the club</div>

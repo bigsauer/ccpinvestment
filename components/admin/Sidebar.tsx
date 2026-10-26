@@ -21,6 +21,7 @@ const NAV = [
       { href: "/admin/speakers", label: "Speakers", icon: "user" },
       { href: "/admin/members", label: "Members", icon: "users" },
       { href: "/admin/content", label: "Site content", icon: "file" },
+      { href: "/admin/images", label: "Site images", icon: "image" },
     ],
   },
   {
@@ -79,6 +80,14 @@ function Icon({ name }: { name: string }) {
         <svg {...common}>
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
           <polyline points="14 2 14 8 20 8" />
+        </svg>
+      );
+    case "image":
+      return (
+        <svg {...common}>
+          <rect x="3" y="4" width="18" height="16" rx="2" />
+          <circle cx="9" cy="10" r="1.6" />
+          <path d="m21 16-5-5-8 8" />
         </svg>
       );
     case "shield":

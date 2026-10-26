@@ -17,7 +17,7 @@ import {
   type UpcomingMeeting,
 } from "@/components/public/UpcomingCard";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { getClubSettings, getLivePageBlocks, getPastMeetings, getSpeakers, getUpcomingMeetings } from "@/lib/queries";
+import { getClubSettings, getLivePageBlocks, getPastMeetings, getSiteImages, getSpeakers, getUpcomingMeetings } from "@/lib/queries";
 import { SCHOOL_ADDRESS, SITE, absoluteUrl, pageMeta, speakerSlug } from "@/lib/site";
 import { dayNumber, displayName, monthName, weekdayName } from "@/lib/utils";
 
@@ -30,12 +30,13 @@ export const metadata: Metadata = pageMeta({
 export const revalidate = 60;
 
 export default async function MeetingsPage() {
-  const [upcoming, pastMeetings, blocks, speakers, settings] = await Promise.all([
+  const [upcoming, pastMeetings, blocks, speakers, settings, images] = await Promise.all([
     getUpcomingMeetings(),
     getPastMeetings(),
     getLivePageBlocks("meetings"),
     getSpeakers(),
     getClubSettings(),
+    getSiteImages(),
   ]);
   // Past sessions come from logged meetings; until officers log those, the speaker archive fills in.
   const past: Array<{ key: string; href: string; photo: string | null; date: Date; title: string; sub: string }> =
@@ -99,7 +100,7 @@ export default async function MeetingsPage() {
       <PublicNav />
       <main>
       <header className="page-banner">
-        <Image className="pb-img" src="/photos/session-04.jpg" alt="Chaminade Investment Club meeting" fill priority sizes="100vw" />
+        <Image className="pb-img" src={images["meetings-banner"].src} alt={images["meetings-banner"].alt} style={images["meetings-banner"].style} fill priority sizes="100vw" />
         <div className="pb-overlay" />
         <div className="wrap pb-content">
           <PageBannerCopy

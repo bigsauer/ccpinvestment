@@ -2,11 +2,20 @@ import { asStringBlocks } from "@/lib/copy";
 import { prisma } from "@/lib/db";
 import { safeHttpUrl } from "@/lib/safe-url";
 import { speakerSlug } from "@/lib/site";
+import { SITE_IMAGE_SLOTS, resolveSiteImage, type ResolvedImage, type SiteImageSlot } from "@/lib/site-images";
 
 export async function getLivePageBlocks(slug: string) {
   const page = await prisma.pageContent.findUnique({ where: { slug } });
   if (!page || page.status !== "LIVE") return {} as Record<string, string>;
   return asStringBlocks(page.blocks);
+}
+
+/** Every replaceable website photo, with the officer's replacement and crop if there is one. */
+export async function getSiteImages() {
+  const rows = await prisma.siteImage.findMany();
+  return Object.fromEntries(
+    SITE_IMAGE_SLOTS.map((def) => [def.slot, resolveSiteImage(def, rows.find((row) => row.slot === def.slot))]),
+  ) as Record<SiteImageSlot, ResolvedImage>;
 }
 
 export async function getClubSettings() {
@@ -25,6 +34,8 @@ export async function getClubSettings() {
       heroCaption: "",
       contactEmail: null as string | null,
       instagramUrl: null as string | null,
+      classYearFrom: 2027,
+      classYearTo: 2035,
     }
   );
 }

@@ -207,6 +207,21 @@ model ClubSettings {
   heroCaption      String  @default("")
   contactEmail     String?
   instagramUrl     String?
+  /// Class years offered on the join form, first to last (inclusive).
+  classYearFrom    Int     @default(2027)
+  classYearTo      Int     @default(2035)
+}
+
+/// A replaced website photo (home hero, page banners...) and how it is cropped. No row = the original image.
+model SiteImage {
+  slot      String   @id
+  photoUrl  String
+  /// Crop focus, 0-100 (CSS object-position percentages).
+  focusX    Int      @default(50)
+  focusY    Int      @default(50)
+  alt       String   @default("")
+  updatedAt DateTime @updatedAt
+  updatedBy String?
 }
 
 /// Uploaded images (speaker, member and officer photos, meeting photos). Stored in the database so

@@ -26,10 +26,12 @@ export async function POST(req: Request) {
 
   try {
     const input = Buffer.from(await file.arrayBuffer());
+    // Website photos (banners, hero) keep more resolution than portraits.
+    const large = new URL(req.url).searchParams.get("size") === "large";
     const data = await sharp(input)
       .rotate()
-      .resize({ width: 1400, height: 1800, fit: "inside", withoutEnlargement: true })
-      .jpeg({ quality: 84, mozjpeg: true })
+      .resize(large ? { width: 2400, height: 1800, fit: "inside", withoutEnlargement: true } : { width: 1400, height: 1800, fit: "inside", withoutEnlargement: true })
+      .jpeg({ quality: large ? 82 : 84, mozjpeg: true })
       .toBuffer();
     const photo = await prisma.photo.create({
       data: { mime: "image/jpeg", data: new Uint8Array(data), size: data.length, label: file.name.slice(0, 120) },

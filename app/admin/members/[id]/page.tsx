@@ -5,12 +5,14 @@ import { ConfirmAction } from "@/components/admin/ConfirmAction";
 import { PhotoField } from "@/components/admin/PhotoField";
 import { Topbar } from "@/components/admin/Topbar";
 import { deleteMember, saveMember } from "@/lib/actions/admin";
+import { classYearList } from "@/lib/class-years";
 import { prisma } from "@/lib/db";
+import { getClubSettings } from "@/lib/queries";
 
 export default async function MemberEditPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const isNew = id === "new";
-  const member = isNew ? null : await prisma.member.findUnique({ where: { id } });
+  const [member, settings] = await Promise.all([isNew ? null : prisma.member.findUnique({ where: { id } }), getClubSettings()]);
   if (!isNew && !member) notFound();
 
   return (
@@ -53,7 +55,12 @@ export default async function MemberEditPage({ params }: { params: Promise<{ id:
               <div className="field-row">
                 <div className="field">
                   <label>Class of</label>
-                  <input name="gradYear" defaultValue={member?.gradYear} placeholder="2027" />
+                  <input name="gradYear" list="class-years" defaultValue={member?.gradYear} placeholder="2027" />
+                  <datalist id="class-years">
+                    {classYearList(settings.classYearFrom, settings.classYearTo).map((year) => (
+                      <option key={year} value={year} />
+                    ))}
+                  </datalist>
                 </div>
                 <div className="field">
                   <label>Status</label>

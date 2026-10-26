@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
+import { classYearList } from "@/lib/class-years";
 import { safeHttpUrl } from "@/lib/safe-url";
 
 export type FormState = {
@@ -41,6 +42,10 @@ export async function submitStudentApplication(
     const lastName = required(formData.get("last"), "Last name");
     const email = required(formData.get("email"), "School email").toLowerCase();
     const gradYear = required(formData.get("grade"), "Class of");
+    const settings = await prisma.clubSettings.findUnique({ where: { id: "club" } });
+    if (!classYearList(settings?.classYearFrom ?? 2027, settings?.classYearTo ?? 2035).includes(gradYear)) {
+      throw new Error("Please choose your class year from the list.");
+    }
     const interest = String(formData.get("interest") ?? "Regular member");
     const why = String(formData.get("why") ?? "").trim().slice(0, 3000);
     if ((await screen(formData, "STUDENT", email)) === "skip") return { ok: true };

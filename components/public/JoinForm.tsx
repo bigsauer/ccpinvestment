@@ -5,7 +5,7 @@ import { submitStudentApplication, type FormState } from "@/lib/actions/applicat
 
 const INTERESTS = ["Curious", "Regular member"] as const;
 
-export function JoinForm() {
+export function JoinForm({ classYears }: { classYears: string[] }) {
   const [interest, setInterest] = useState<(typeof INTERESTS)[number]>("Regular member");
   const [state, action, pending] = useActionState(
     submitStudentApplication,
@@ -33,11 +33,9 @@ export function JoinForm() {
           <label htmlFor="grade">Class of</label>
           <select id="grade" name="grade" required disabled={state.ok} defaultValue="">
             <option value="">Select —</option>
-            <option>2027</option>
-            <option>2028</option>
-            <option>2029</option>
-            <option>2030</option>
-            <option>2031</option>
+            {classYears.map((year) => (
+              <option key={year}>{year}</option>
+            ))}
           </select>
         </div>
         <div className="field">

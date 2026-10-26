@@ -1,27 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { uploadPhoto } from "@/components/admin/upload";
 import { useCanWrite } from "@/components/admin/WriteGate";
-
-const MAX_EDGE = 1600;
-
-/** Shrinks a big phone photo in the browser first, so uploads stay quick and under host body limits. */
-async function downscale(file: File): Promise<Blob> {
-  if (!file.type.startsWith("image/") || file.type === "image/gif") return file;
-  try {
-    const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
-    const scale = Math.min(1, MAX_EDGE / Math.max(bitmap.width, bitmap.height));
-    if (scale === 1 && file.size < 1_500_000) return file;
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.round(bitmap.width * scale);
-    canvas.height = Math.round(bitmap.height * scale);
-    canvas.getContext("2d")?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-    const blob: Blob | null = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.88));
-    return blob ?? file;
-  } catch {
-    return file; // e.g. HEIC the browser cannot decode: the server converts it
-  }
-}
 
 export function PhotoField({ name = "photoUrl", defaultValue, label = "Photo" }: { name?: string; defaultValue?: string | null; label?: string }) {
   const writable = useCanWrite();
@@ -34,13 +15,7 @@ export function PhotoField({ name = "photoUrl", defaultValue, label = "Photo" }:
     setBusy(true);
     setError(null);
     try {
-      const blob = await downscale(file);
-      const body = new FormData();
-      body.set("file", blob, file.name.replace(/\.[^.]+$/, "") + ".jpg");
-      const res = await fetch("/api/admin/photo", { method: "POST", body });
-      const json = (await res.json().catch(() => ({}))) as { url?: string; error?: string };
-      if (!res.ok || !json.url) throw new Error(json.error ?? "Upload failed. Try again.");
-      setUrl(json.url);
+      setUrl(await uploadPhoto(file));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Upload failed");
     } finally {
