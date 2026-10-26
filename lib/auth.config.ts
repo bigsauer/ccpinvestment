@@ -1,6 +1,6 @@
 import type { NextAuthConfig } from "next-auth";
 
-type OfficerRole = "PRESIDENT" | "VP" | "SECRETARY" | "TREASURER" | "ADVISOR";
+type OfficerRole = "PRESIDENT" | "VP" | "SECRETARY" | "TREASURER" | "ADVISOR" | "PORTFOLIO_MANAGER";
 
 export const authConfig = {
   trustHost: true,

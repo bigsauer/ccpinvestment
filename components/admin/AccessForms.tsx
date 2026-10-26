@@ -1,5 +1,6 @@
 "use client";
 
+import { BrandMark } from "@/components/admin/BrandMark";
 import Link from "next/link";
 import { useActionState } from "react";
 import { acceptInvitation, requestOfficerAccess, setupFirstAdmin } from "@/lib/actions/access";
@@ -21,7 +22,8 @@ export function SetupForm() {
   return (
     <div className="login-wrap">
       <form className="form login-card" action={action}>
-        <div className="form-head">
+        <BrandMark />
+          <div className="form-head">
           <div className="t">Create the first admin</div>
           <div className="s">cic / setup</div>
         </div>
@@ -75,7 +77,8 @@ export function AcceptInviteForm({ token, email, name, roleLabel, classYear }: {
     <div className="login-wrap">
       <form className="form login-card" action={action}>
         <input type="hidden" name="token" value={token} />
-        <div className="form-head">
+        <BrandMark />
+          <div className="form-head">
           <div className="t">Create your officer account</div>
           <div className="s">cic / invite</div>
         </div>
@@ -120,7 +123,8 @@ export function RequestAccessForm() {
   return (
     <div className="login-wrap">
       <form className="form login-card" action={action}>
-        <div className="form-head">
+        <BrandMark />
+          <div className="form-head">
           <div className="t">Request officer access</div>
           <div className="s">cic / sign-up</div>
         </div>

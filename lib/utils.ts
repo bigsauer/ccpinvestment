@@ -72,7 +72,9 @@ export function linkedinHandle(url: string) {
 export function roleLabel(role: string) {
   switch (role) {
     case "PRESIDENT":
-      return "President";
+      return "Co-President";
+    case "PORTFOLIO_MANAGER":
+      return "Portfolio Manager";
     case "VP":
       return "Vice President";
     case "SECRETARY":

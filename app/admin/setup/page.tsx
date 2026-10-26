@@ -1,3 +1,4 @@
+import { BrandMark } from "@/components/admin/BrandMark";
 import Link from "next/link";
 import { SetupForm } from "@/components/admin/AccessForms";
 import { prisma } from "@/lib/db";
@@ -12,6 +13,7 @@ export default async function SetupPage() {
     return (
       <div className="login-wrap">
         <div className="form login-card">
+          <BrandMark />
           <div className="form-head">
             <div className="t">{hasOfficers ? "Setup is finished" : "Setup is turned off"}</div>
             <div className="s">cic / setup</div>

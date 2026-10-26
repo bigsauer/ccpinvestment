@@ -1,0 +1,2 @@
+-- New officer role
+ALTER TYPE "OfficerRole" ADD VALUE IF NOT EXISTS 'PORTFOLIO_MANAGER';

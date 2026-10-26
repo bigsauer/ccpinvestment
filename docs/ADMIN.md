@@ -8,8 +8,8 @@ Sign in at **/admin** (for example `www.ccpinvestmentclub.com/admin`). Officers 
 
 | Role | Can do |
 |---|---|
-| Super admin / President | Everything, plus invite, edit, deactivate and delete officers |
-| Vice President, Secretary, Treasurer | Edit all site content, handle inquiries, manage members and speakers |
+| Super admin / Co-President | Everything, plus invite, edit, deactivate and delete officers |
+| Vice President, Portfolio Manager, Secretary, Treasurer | Edit all site content, handle inquiries, manage members and speakers |
 | Faculty advisor | View only |
 
 ## Getting started (first time only)
@@ -20,7 +20,7 @@ Sign in at **/admin** (for example `www.ccpinvestmentclub.com/admin`). Officers 
 
 ## Adding and removing officers (Officers page)
 
-- **Invite**: Officers, Invitations, enter their email and role. You get a one-time link (7 days). Send it by email or message. They choose their own password.
+- **Invite**: Officers, Invitations, enter their email and role. You get a one-time link (7 days). Press **Copy styled email**, open a new message and paste: it comes with the club logo and a Create-my-account button. (If the site is set up to send email, it sends that email for you.) They choose their own password.
 - **Sign-up requests**: people can ask for access at `/admin/signup`. Approve it under Officers, Access requests, pick a role, and send them the link.
 - **Change a role, switch an account off, or set a temporary password**: Officers, Manage. A temporary password forces them to pick their own at sign-in.
 - **Delete**: Officers, Manage, Delete. Their notes stay, signed with their name. The last super admin cannot be removed.
@@ -47,4 +47,4 @@ Sign in at **/admin** (for example `www.ccpinvestmentclub.com/admin`). Officers 
 - Times are St. Louis time.
 - Changes show on the public site within about a minute.
 - Photos are uploaded straight from the form and stored in the database, so they work on every host.
-- Email notifications are not set up. New inquiries show on the Dashboard and as a number on the Inquiries menu item, and "Reply by email" opens your mail app.
+- Email: the site can send the branded invitation email itself once `RESEND_API_KEY` and `MAIL_FROM` are set (see `.env.example`). Until then, use **Copy styled email**. Other notifications are not set up. New inquiries show on the Dashboard and as a number on the Inquiries menu item, and "Reply by email" opens your mail app.

@@ -9,7 +9,7 @@ Public site + officer admin CMS for the Chaminade College Preparatory Investment
 | Stack | Next.js 15 App Router + TypeScript + Tailwind 4 |
 | Data | Postgres via Prisma, local Docker on **port 5436** (5433 is Aeris) |
 | Auth | Auth.js (NextAuth v5) credentials — **officer login only**, no public accounts |
-| Roles | President, VP, Secretary, Treasurer (write); Advisor (read-only) |
+| Roles | Co-President, VP, Portfolio Manager, Secretary, Treasurer (write); Advisor (read-only) |
 | Content | `PageContent` JSON blocks — simple field editor, not a freeform CMS |
 | RSVPs | Officer-entered count on meetings (no public RSVP form) |
 | Email | Stub — confirmations log to `ActivityLog` only |

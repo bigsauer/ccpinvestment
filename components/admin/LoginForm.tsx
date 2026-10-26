@@ -1,5 +1,6 @@
 "use client";
 
+import { BrandMark } from "@/components/admin/BrandMark";
 import { useActionState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -19,7 +20,8 @@ export function LoginForm() {
     <div className="login-wrap">
       <form className="form login-card" action={action}>
         <input type="hidden" name="callbackUrl" value={callbackUrl} />
-        <div className="form-head">
+        <BrandMark />
+          <div className="form-head">
           <div className="t">Officer login</div>
           <div className="s">cic / admin</div>
         </div>

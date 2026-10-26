@@ -6,9 +6,11 @@ import { prisma } from "@/lib/db";
 import type { FormState } from "@/lib/form-state";
 import { getActor, logActivity, newToken, requestOrigin, requireManager } from "@/lib/guard";
 import { checkPassword, done, fail, localPhotoPath, revalidateAdmin, revalidatePublic, str } from "@/lib/actions/util";
+import { inviteEmail } from "@/lib/email-templates";
+import { mailConfigured, sendEmail } from "@/lib/mail";
 import { roleLabel } from "@/lib/utils";
 
-const ROLES: OfficerRole[] = ["PRESIDENT", "VP", "SECRETARY", "TREASURER", "ADVISOR"];
+const ROLES: OfficerRole[] = ["PRESIDENT", "VP", "PORTFOLIO_MANAGER", "SECRETARY", "TREASURER", "ADVISOR"];
 const INVITE_DAYS = 7;
 
 function parseRole(raw: string): OfficerRole {
@@ -45,10 +47,20 @@ async function createInvitation(opts: { email: string; name: string; role: Offic
   return { invitation, link };
 }
 
-function inviteMailto(email: string, name: string, role: OfficerRole, link: string, inviter: string) {
-  const subject = "You're invited to help run the Chaminade Investment Club site";
-  const body = `Hi${name ? ` ${name.split(" ")[0]}` : ""},\n\n${inviter} invited you to be ${roleLabel(role)} on the Chaminade Investment Club admin site.\n\nCreate your account here (the link works once and expires in ${INVITE_DAYS} days):\n${link}\n`;
-  return `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+/** Builds the branded invitation email and sends it if email is set up; otherwise hands it back to copy. */
+async function deliverInvite(opts: { to: string; name: string; role: OfficerRole; link: string; inviter: string; headline: string }): Promise<FormState> {
+  const mail = inviteEmail({ name: opts.name, roleLabel: roleLabel(opts.role), link: opts.link, inviterName: opts.inviter, days: INVITE_DAYS });
+  const plainMailto = `mailto:${encodeURIComponent(opts.to)}?subject=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.text)}`;
+  if (mailConfigured()) {
+    const sent = await sendEmail({ to: opts.to, subject: mail.subject, html: mail.html, text: mail.text });
+    if (sent.ok) return done(`${opts.headline}. The invitation email was sent to ${opts.to}.`, { emailed: true, link: opts.link });
+    return done(`${opts.headline}. The site could not send the email (${sent.error}), so use the options below.`, {
+      link: opts.link,
+      mailto: plainMailto,
+      email: { ...mail, to: opts.to },
+    });
+  }
+  return done(`${opts.headline}.`, { link: opts.link, mailto: plainMailto, email: { ...mail, to: opts.to } });
 }
 
 /* ───────────── Invitations and access requests (managers) ───────────── */
@@ -63,7 +75,7 @@ export async function inviteOfficer(_prev: FormState, formData: FormData): Promi
     const { link } = await createInvitation({ email, name, role, classYear: str(formData, "classYear") || null, invitedById: actor.id });
     await logActivity(actor, `Invited ${email} as ${roleLabel(role)}`, "Invitation");
     revalidateAdmin();
-    return done(`Invitation ready for ${email}`, { link, mailto: inviteMailto(email, name, role, link, actor.name) });
+    return deliverInvite({ to: email, name, role, link, inviter: actor.name, headline: `Invitation ready for ${email}` });
   } catch (error) {
     return fail(error);
   }
@@ -78,7 +90,7 @@ export async function renewInvitation(_prev: FormState, formData: FormData): Pro
     const { link } = await createInvitation({ email: old.email, name: old.name, role: old.role, classYear: old.classYear, invitedById: actor.id });
     await logActivity(actor, `New invitation link for ${old.email}`, "Invitation");
     // No revalidation here: re-rendering the page would replace this card and drop the one-time link on screen.
-    return done("New link ready", { link, mailto: inviteMailto(old.email, old.name, old.role, link, actor.name) });
+    return deliverInvite({ to: old.email, name: old.name, role: old.role, link, inviter: actor.name, headline: "New link ready" });
   } catch (error) {
     return fail(error);
   }
@@ -106,7 +118,7 @@ export async function approveAccessRequest(_prev: FormState, formData: FormData)
     await prisma.accessRequest.update({ where: { id: request.id }, data: { status: "APPROVED", decidedBy: actor.name, decidedAt: new Date() } });
     await logActivity(actor, `Access approved — ${request.name} as ${roleLabel(role)}`, "AccessRequest", request.id);
     // No revalidation here (see renewInvitation): the link must stay on screen. The lists update on the next visit.
-    return done(`Approved ${request.name}`, { link, mailto: inviteMailto(request.email, request.name, role, link, actor.name) });
+    return deliverInvite({ to: request.email, name: request.name, role, link, inviter: actor.name, headline: `Approved ${request.name}` });
   } catch (error) {
     return fail(error);
   }

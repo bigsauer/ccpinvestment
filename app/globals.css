@@ -1936,3 +1936,9 @@ button.gi-door { width: 100%; text-align: left; background: transparent; border:
 .img-tile .meta { padding: 14px 16px 16px; }
 .img-tile .meta .n { font-weight: 500; margin-bottom: 4px; }
 .img-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+
+/* === ADMIN: logo on sign-in style cards === */
+.login-brand { display: flex; align-items: center; gap: 14px; margin: 0 0 18px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+.login-brand img { border-radius: 50%; flex: none; }
+.login-brand .n { font-family: Georgia, 'Times New Roman', serif; font-size: 19px; line-height: 1.15; color: var(--ink); }
+.login-brand .s { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-top: 3px; }

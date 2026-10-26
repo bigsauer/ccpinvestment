@@ -4,6 +4,7 @@ import { useActionState, useEffect, useRef, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { WriteFieldset } from "@/components/admin/WriteGate";
 import { CopyField } from "@/components/admin/CopyField";
+import { CopyStyledEmail } from "@/components/admin/CopyStyledEmail";
 import type { FormState } from "@/lib/form-state";
 
 type Props = {
@@ -50,12 +51,20 @@ export function AdminForm({ action, children, submitLabel = "Save", pendingLabel
             {state.ok && state.message ? <span className="admin-ok">✓ {state.message}</span> : null}
           </div>
         </div>
-        {state.ok && state.link ? (
+        {state.ok && state.link && !state.emailed ? (
           <div className="admin-link-box">
-            <CopyField value={state.link} label="Send this link (it works once)" />
+            {state.email ? (
+              <div style={{ flexBasis: "100%" }}>
+                <div className="admin-note" style={{ marginBottom: 8 }}>
+                  The site can&apos;t send email yet. Copy the styled invitation, paste it into a new message to <b>{state.email.to}</b>, and send it.
+                </div>
+                <CopyStyledEmail html={state.email.html} text={state.email.text} />
+              </div>
+            ) : null}
+            <CopyField value={state.link} label="Or just send this link (it works once)" />
             {state.mailto ? (
               <a className="btn" href={state.mailto}>
-                Email it
+                Plain-text email
               </a>
             ) : null}
           </div>

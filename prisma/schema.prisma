@@ -38,11 +38,13 @@ enum ApplicationStatus {
 }
 
 enum OfficerRole {
+  /// Shown as "Co-President" (a club can have more than one).
   PRESIDENT
   VP
   SECRETARY
   TREASURER
   ADVISOR
+  PORTFOLIO_MANAGER
 }
 
 enum PageStatus {

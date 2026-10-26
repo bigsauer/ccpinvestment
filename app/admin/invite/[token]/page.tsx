@@ -1,3 +1,4 @@
+import { BrandMark } from "@/components/admin/BrandMark";
 import Link from "next/link";
 import { AcceptInviteForm } from "@/components/admin/AccessForms";
 import { prisma } from "@/lib/db";
@@ -15,6 +16,7 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
     return (
       <div className="login-wrap">
         <div className="form login-card">
+          <BrandMark />
           <div className="form-head">
             <div className="t">This invitation is no longer valid</div>
             <div className="s">cic / invite</div>

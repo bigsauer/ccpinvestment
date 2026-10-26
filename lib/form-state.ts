@@ -9,4 +9,8 @@ export type FormState = {
   mailto?: string;
   /** Where to send the browser after it works (for example the new record's editor). */
   redirectTo?: string;
+  /** The invitation email went out from the site itself. */
+  emailed?: boolean;
+  /** The styled email, so the admin can copy it into their own mail app when the site cannot send. */
+  email?: { subject: string; html: string; text: string; to: string };
 };

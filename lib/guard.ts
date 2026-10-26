@@ -37,7 +37,7 @@ export function canWriteContent(actor: Pick<Actor, "role">) {
   return actor.role !== "ADVISOR";
 }
 
-/** Super admins and the club president can invite, edit and remove officers. */
+/** Super admins and co-presidents can invite, edit and remove officers. */
 export function canManageOfficers(actor: Pick<Actor, "role" | "isSuperAdmin">) {
   return actor.isSuperAdmin || actor.role === "PRESIDENT";
 }
@@ -52,7 +52,7 @@ export async function requireWriter() {
 export async function requireManager() {
   const actor = await getActor();
   if (!actor) throw new Error("Sign in required");
-  if (!canManageOfficers(actor)) throw new Error("Only a super admin or the president can manage officers");
+  if (!canManageOfficers(actor)) throw new Error("Only a super admin or a co-president can manage officers");
   return actor;
 }
 

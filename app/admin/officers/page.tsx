@@ -8,7 +8,7 @@ import { prisma } from "@/lib/db";
 import { canManageOfficers, getActor } from "@/lib/guard";
 import { relativeWhen, roleLabel } from "@/lib/utils";
 
-const ROLE_OPTIONS = ["PRESIDENT", "VP", "SECRETARY", "TREASURER", "ADVISOR"] as const;
+const ROLE_OPTIONS = ["PRESIDENT", "VP", "PORTFOLIO_MANAGER", "SECRETARY", "TREASURER", "ADVISOR"] as const;
 
 function RoleSelect({ name = "role", defaultValue = "SECRETARY" }: { name?: string; defaultValue?: string }) {
   return (
@@ -48,7 +48,7 @@ export default async function OfficersPage({ searchParams }: { searchParams: Pro
               The people <span className="serif">who run this.</span>
             </h1>
             <p className="sub">
-              Invite officers, review sign-up requests, switch accounts off, or remove them. Super admins and the president manage this page.
+              Invite officers, review sign-up requests, switch accounts off, or remove them. Super admins and co-presidents manage this page.
             </p>
           </div>
           {manager ? (
@@ -74,7 +74,7 @@ export default async function OfficersPage({ searchParams }: { searchParams: Pro
           </div>
         ) : (
           <div className="info-note" style={{ marginBottom: 16 }}>
-            You can see the team here. Only a super admin or the president can invite, edit or remove officers.
+            You can see the team here. Only a super admin or a co-president can invite, edit or remove officers.
           </div>
         )}
 

@@ -9,7 +9,7 @@ import { prisma } from "@/lib/db";
 import { canManageOfficers, getActor } from "@/lib/guard";
 import { roleLabel } from "@/lib/utils";
 
-const ROLE_OPTIONS = ["PRESIDENT", "VP", "SECRETARY", "TREASURER", "ADVISOR"] as const;
+const ROLE_OPTIONS = ["PRESIDENT", "VP", "PORTFOLIO_MANAGER", "SECRETARY", "TREASURER", "ADVISOR"] as const;
 
 export default async function OfficerEditPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
