@@ -6,13 +6,14 @@ export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  const [speakers, nextMeeting] = await Promise.all([
+  const [speakers, nextMeeting, builtPages] = await Promise.all([
     prisma.speaker.findMany({ select: { firstName: true, lastName: true, updatedAt: true } }),
     prisma.meeting.findFirst({
       where: { published: true },
       orderBy: { updatedAt: "desc" },
       select: { updatedAt: true },
     }),
+    prisma.customPage.findMany({ where: { status: "LIVE" }, select: { slug: true, updatedAt: true } }),
   ]);
 
   const pages: MetadataRoute.Sitemap = [
@@ -30,5 +31,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...pages, ...profiles];
+  const custom: MetadataRoute.Sitemap = builtPages.map((p) => ({
+    url: absoluteUrl(`/${p.slug}`),
+    lastModified: p.updatedAt,
+    changeFrequency: "monthly",
+    priority: 0.6,
+  }));
+
+  return [...pages, ...profiles, ...custom];
 }

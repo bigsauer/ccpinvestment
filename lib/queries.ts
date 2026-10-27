@@ -2,6 +2,8 @@ import { asStringBlocks } from "@/lib/copy";
 import { prisma } from "@/lib/db";
 import { safeHttpUrl } from "@/lib/safe-url";
 import { speakerSlug } from "@/lib/site";
+import { DEFAULT_NAV, type NavLink } from "@/lib/nav";
+import { sanitizeBlocks } from "@/lib/page-blocks";
 import { SITE_IMAGE_SLOTS, resolveSiteImage, type ResolvedImage, type SiteImageSlot } from "@/lib/site-images";
 
 export async function getLivePageBlocks(slug: string) {
@@ -143,4 +145,19 @@ export async function getMeetingForSpeaker(speakerId: string) {
     where: { speakerId, published: true },
     orderBy: { date: "desc" },
   });
+}
+
+/** The site menu: the officers' version when they have saved one, otherwise the original. */
+export async function getNavLinks(): Promise<NavLink[]> {
+  const rows = await prisma.navItem.findMany({ where: { visible: true }, orderBy: { position: "asc" } });
+  const total = await prisma.navItem.count();
+  if (total === 0) return DEFAULT_NAV;
+  return rows.map((row) => ({ label: row.label, href: row.href }));
+}
+
+/** A published page built with the page builder, or null. */
+export async function getCustomPage(slug: string) {
+  const page = await prisma.customPage.findUnique({ where: { slug } });
+  if (!page || page.status !== "LIVE") return null;
+  return { ...page, blocks: sanitizeBlocks(page.blocks) };
 }

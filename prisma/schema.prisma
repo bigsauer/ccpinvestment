@@ -277,3 +277,35 @@ model AccessRequest {
   @@index([status])
   @@index([email])
 }
+
+/// A page officers build themselves with the page builder. Served at /<slug> when published.
+model CustomPage {
+  id          String     @id @default(cuid())
+  slug        String     @unique
+  title       String
+  /// Search and share description.
+  description String     @default("")
+  /// Optional wide photo behind the page title, with crop focus (0-100).
+  bannerUrl   String?
+  bannerX     Int        @default(50)
+  bannerY     Int        @default(30)
+  /// Ordered list of content blocks (see lib/page-blocks.ts).
+  blocks      Json       @default("[]")
+  status      PageStatus @default(DRAFT)
+  updatedBy   String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([status])
+}
+
+/// A link in the site menu. No rows means the original menu is shown.
+model NavItem {
+  id       String  @id @default(cuid())
+  label    String
+  href     String
+  position Int     @default(0)
+  visible  Boolean @default(true)
+
+  @@index([position])
+}

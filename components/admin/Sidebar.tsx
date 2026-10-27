@@ -20,7 +20,9 @@ const NAV = [
       { href: "/admin/meetings", label: "Meetings", icon: "cal" },
       { href: "/admin/speakers", label: "Speakers", icon: "user" },
       { href: "/admin/members", label: "Members", icon: "users" },
-      { href: "/admin/content", label: "Site content", icon: "file" },
+      { href: "/admin/pages", label: "Pages", icon: "layers" },
+      { href: "/admin/navigation", label: "Navigation", icon: "menu" },
+      { href: "/admin/content", label: "Page wording", icon: "file" },
       { href: "/admin/images", label: "Site images", icon: "image" },
     ],
   },
@@ -30,6 +32,7 @@ const NAV = [
       { href: "/admin/officers", label: "Officers", icon: "shield", badgeKey: "requests" as const },
       { href: "/admin/activity", label: "Activity log", icon: "clock" },
       { href: "/admin/settings", label: "Settings", icon: "gear" },
+      { href: "/admin/help", label: "Help & handoff", icon: "help" },
     ],
   },
 ];
@@ -88,6 +91,26 @@ function Icon({ name }: { name: string }) {
           <rect x="3" y="4" width="18" height="16" rx="2" />
           <circle cx="9" cy="10" r="1.6" />
           <path d="m21 16-5-5-8 8" />
+        </svg>
+      );
+    case "layers":
+      return (
+        <svg {...common}>
+          <path d="m12 3 9 5-9 5-9-5z" />
+          <path d="m3 13 9 5 9-5" />
+        </svg>
+      );
+    case "menu":
+      return (
+        <svg {...common}>
+          <path d="M4 7h16M4 12h16M4 17h10" />
+        </svg>
+      );
+    case "help":
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M9.5 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-.9.8-.9 1.4M12 16.5h.01" />
         </svg>
       );
     case "shield":

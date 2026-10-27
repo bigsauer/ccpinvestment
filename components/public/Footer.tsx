@@ -1,7 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
+import { getNavLinks } from "@/lib/queries";
 
-export function PublicFooter() {
+export async function PublicFooter() {
+  const links = (await getNavLinks()).filter((link) => link.href !== "/");
   return (
     <footer>
       <div className="wrap foot-row">
@@ -10,12 +12,13 @@ export function PublicFooter() {
           <div className="brand-name">Chaminade Investment Club</div>
         </div>
         <div className="foot-links">
-          <Link href="/meetings">Meetings</Link>
-          <Link href="/speakers">Speakers</Link>
-          <Link href="/get-involved">Get involved</Link>
-          <Link href="/team">Team</Link>
+          {links.map((link) => (
+            <Link key={link.href + link.label} href={link.href}>
+              {link.label}
+            </Link>
+          ))}
         </div>
-        <div className="note mono">© 2026 · Chaminade College Prep · St. Louis, MO</div>
+        <div className="note mono">© {new Date().getFullYear()} · Chaminade College Prep · St. Louis, MO</div>
       </div>
     </footer>
   );
