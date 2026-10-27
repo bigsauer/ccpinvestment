@@ -2,11 +2,14 @@ import Link from "next/link";
 import { ConfirmAction } from "@/components/admin/ConfirmAction";
 import { Topbar } from "@/components/admin/Topbar";
 import { duplicatePage } from "@/lib/actions/pages";
+import { SYSTEM_PAGES, SYSTEM_SLUGS } from "@/lib/default-pages";
 import { prisma } from "@/lib/db";
 import { relativeWhen } from "@/lib/utils";
 
 export default async function PagesAdmin() {
-  const pages = await prisma.customPage.findMany({ orderBy: { updatedAt: "desc" } });
+  const all = await prisma.customPage.findMany({ orderBy: { updatedAt: "desc" } });
+  const pages = all.filter((p) => !SYSTEM_SLUGS.includes(p.slug as never));
+  const systemRows = new Map(all.filter((p) => SYSTEM_SLUGS.includes(p.slug as never)).map((p) => [p.slug, p]));
 
   return (
     <>
@@ -28,11 +31,48 @@ export default async function PagesAdmin() {
           </div>
         </div>
 
+        <div className="card" style={{ marginBottom: 24 }}>
+          <div className="card-head">
+            <h3>The club&apos;s own pages</h3>
+            <div className="desc">built with the same sections</div>
+          </div>
+          <table className="table">
+            <tbody>
+              {SYSTEM_PAGES.map((def) => {
+                const row = systemRows.get(def.slug);
+                return (
+                  <tr key={def.slug} className="row">
+                    <td>
+                      <Link className="tbl-link" href={`/admin/pages/${def.slug}`}>
+                        {def.slug === "home" ? "Home" : def.slug === "get-involved" ? "Get involved" : def.slug[0]!.toUpperCase() + def.slug.slice(1)}
+                      </Link>
+                    </td>
+                    <td className="row-sub">{def.path}</td>
+                    <td>
+                      <span className="pill green">Built-in</span> {row && row.updatedBy !== "Original design" ? <span className="pill amber">Edited</span> : <span className="pill gray">Original</span>}
+                    </td>
+                    <td>{row && row.updatedBy !== "Original design" ? relativeWhen(row.updatedAt) : "—"}</td>
+                    <td className="cell-actions">
+                      <Link className="btn" href={`/admin/pages/${def.slug}`}>
+                        Edit
+                      </Link>{" "}
+                      <Link className="btn" href={def.path} target="_blank">
+                        View
+                      </Link>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+
+        <h3 style={{ margin: "8px 0 12px" }}>Pages you&apos;ve built</h3>
         {pages.length === 0 ? (
           <div className="card" style={{ padding: 28 }}>
             <h3 style={{ marginBottom: 6 }}>No pages yet</h3>
             <p className="admin-note" style={{ marginBottom: 14 }}>
-              The built-in pages (Home, Meetings, Speakers, Get involved, Team) are edited from Site content and their own sections. This is for everything else.
+              Make one for a program, an event, an FAQ or a thank-you. It can use any of the sections above, including the ones the club&apos;s own pages are made from.
             </p>
             <Link href="/admin/pages/new" className="btn red">
               Create the first page

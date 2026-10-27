@@ -1,8 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import { CountUp } from "@/components/public/CountUp";
-import { cleanHref, cleanImagePath, videoEmbedUrl, type Block } from "@/lib/page-blocks";
+import { RichHeadline } from "@/components/public/RichHeadline";
+import { DYNAMIC_SECTION_TYPES, SITE_SECTION_TYPES, blockDef, cleanHref, cleanImagePath, videoEmbedUrl, type Block } from "@/lib/page-blocks";
+import { previewCtx, type PageCtx } from "@/lib/page-context";
+import type { SiteImageSlot } from "@/lib/site-images";
 
 /** A speaker as the Speakers block shows them. Passed in by the page, so this file never touches the database. */
 export type BlockSpeaker = { id: string; name: string; role: string; photoUrl: string | null; slug: string; status: string; season: string | null };
@@ -91,6 +94,207 @@ function Button({ label, href, kind = "red" }: { label: string; href: string; ki
       {label} <span className="arrow">→</span>
     </SmartLink>
   );
+}
+
+function SiteSection({ block, ctx }: { block: Block; ctx: PageCtx }) {
+  const { settings, images } = ctx;
+  switch (block.type) {
+    case "pageBanner": {
+      const custom = cleanImagePath(str(block, "image"));
+      const slot = str(block, "imageSlot") as SiteImageSlot;
+      const photo = custom ? { src: custom, alt: "", style: { objectPosition: "50% 30%" } } : slot && images[slot] ? images[slot] : null;
+      const crumbs = str(block, "crumbs").replace(/\{season\}/g, settings.seasonLabel);
+      return (
+        <header className={photo ? "page-banner" : "page-banner gi-banner"}>
+          {photo ? (
+            <>
+              <Image className="pb-img" src={photo.src} alt={photo.alt} style={photo.style} fill priority sizes="100vw" />
+              <div className="pb-overlay" />
+            </>
+          ) : null}
+          <div className="wrap pb-content">
+            {crumbs ? <div className="crumbs">{crumbs}</div> : null}
+            <h1>
+              <RichHeadline text={str(block, "headline")} />
+            </h1>
+            {str(block, "lede") ? <p className="lede">{str(block, "lede")}</p> : null}
+          </div>
+          {photo && str(block, "caption") ? <div className="pb-caption">{str(block, "caption")}</div> : null}
+        </header>
+      );
+    }
+    case "homeHero": {
+      const photo = images["home-hero"];
+      return (
+        <header className="hero-photo">
+          <div className="hero-photo-inner">
+            <Image className="hero-bg" src={photo.src} alt={photo.alt} style={photo.style} fill priority sizes="100vw" />
+            <div className="hero-overlay" />
+            <div className="hero-content wrap">
+              <div className="eyebrow light">
+                <span className="dot" />
+                <span>{settings.seasonLabel.toUpperCase()}</span>
+                <span className="div" />
+                <span>{ctx.nextLabel}</span>
+              </div>
+              <h1 className="display light">
+                <RichHeadline text={str(block, "headline")} />
+              </h1>
+              <p className="lede light">{str(block, "lede")}</p>
+              <div className="hero-ctas">
+                {str(block, "primaryLabel") && cleanHref(str(block, "primaryHref")) ? (
+                  <SmartLink href={str(block, "primaryHref")} className="btn red lg">
+                    {str(block, "primaryLabel")} <span className="arrow">→</span>
+                  </SmartLink>
+                ) : null}
+                {str(block, "secondaryLabel") && cleanHref(str(block, "secondaryHref")) ? (
+                  <SmartLink href={str(block, "secondaryHref")} className="btn ghost lg">
+                    {str(block, "secondaryLabel")}
+                  </SmartLink>
+                ) : null}
+              </div>
+            </div>
+            {settings.heroCaption ? (
+              <div className="hero-caption">
+                <span className="mono">{settings.heroCaption}</span>
+              </div>
+            ) : null}
+          </div>
+        </header>
+      );
+    }
+    case "logoBand":
+      return (
+        <section className="logo-band">
+          <div className="wrap logo-band-inner">
+            <div className="logo-band-item">
+              <Image src="/brand/club-mark.png" alt="Chaminade Investment Club" width={44} height={44} />
+              <div>
+                <div className="t">Chaminade Investment Club</div>
+                <div className="s">Est. {settings.foundedYear} · Student-led</div>
+              </div>
+            </div>
+            <div className="logo-band-sep" />
+            <div className="logo-band-item">
+              <Image className="seal" src="/brand/school-seal.png" alt="Chaminade College Preparatory School" width={44} height={44} />
+              <div>
+                <div className="t">Chaminade College Preparatory</div>
+                <div className="s">St. Louis, Missouri · Since 1910</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+    case "homeStats":
+      return (
+        <section className="stats">
+          <div className="wrap stats-inner">
+            <div className="stat">
+              <div className="k">Members</div>
+              <div className="v mono">
+                <CountUp value={settings.statMembers} />
+              </div>
+              <div className="d">Across all grades</div>
+            </div>
+            <div className="stat">
+              <div className="k">Guest speakers</div>
+              <div className="v mono">
+                <CountUp value={settings.statSpeakers} delay={140} />
+              </div>
+              <div className="d">Since founding</div>
+            </div>
+            <div className="stat">
+              <div className="k">Sessions held</div>
+              <div className="v mono">
+                <CountUp value={settings.statSessions} delay={280} />
+              </div>
+              <div className="d">2024 → present</div>
+            </div>
+            <div className="stat">
+              <div className="k">Estab.</div>
+              <div className="v">
+                <CountUp value={settings.foundedYear} from={2000} delay={420} />
+              </div>
+              <div className="d">Fully student-run</div>
+            </div>
+          </div>
+        </section>
+      );
+    case "featureGrid":
+      return (
+        <section className="section">
+          <div className="wrap">
+            <div className="section-head">
+              <div>
+                {str(block, "label") ? <div className="section-label">{str(block, "label")}</div> : null}
+                <h2>
+                  <RichHeadline text={str(block, "heading")} />
+                </h2>
+              </div>
+              <p>{str(block, "intro")}</p>
+            </div>
+            <div className="features">
+              {list(block, "items").map((item, i) => (
+                <div key={i} className="feature">
+                  <div className="num">{item.num}</div>
+                  <h3>{item.title}</h3>
+                  <p>{item.text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+    case "pitch": {
+      const photo = images["home-inside"];
+      return (
+        <section className="section">
+          <div className="wrap pitch">
+            <div className="ph">
+              <Image src={photo.src} alt={photo.alt} style={photo.style} fill sizes="(max-width: 900px) 100vw, 50vw" />
+            </div>
+            <div>
+              {str(block, "label") ? <div className="section-label">{str(block, "label")}</div> : null}
+              <h2>
+                <RichHeadline text={str(block, "heading")} />
+              </h2>
+              {str(block, "body1") ? <p>{str(block, "body1")}</p> : null}
+              {str(block, "body2") ? <p>{str(block, "body2")}</p> : null}
+              {str(block, "buttonLabel") && cleanHref(str(block, "buttonHref")) ? (
+                <div style={{ marginTop: 24 }}>
+                  <SmartLink href={str(block, "buttonHref")} className="btn">
+                    {str(block, "buttonLabel")} <span className="arrow">→</span>
+                  </SmartLink>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </section>
+      );
+    }
+    case "ctaBand":
+      return (
+        <section className="cta-band">
+          <div className="wrap">
+            <h2>{str(block, "heading")}</h2>
+            <div style={{ display: "flex", gap: 10 }}>
+              {str(block, "primaryLabel") && cleanHref(str(block, "primaryHref")) ? (
+                <SmartLink href={str(block, "primaryHref")} className="btn red lg">
+                  {str(block, "primaryLabel")} <span className="arrow">→</span>
+                </SmartLink>
+              ) : null}
+              {str(block, "secondaryLabel") && cleanHref(str(block, "secondaryHref")) ? (
+                <SmartLink href={str(block, "secondaryHref")} className="btn lg">
+                  {str(block, "secondaryLabel")}
+                </SmartLink>
+              ) : null}
+            </div>
+          </div>
+        </section>
+      );
+    default:
+      return null;
+  }
 }
 
 function BlockView({ block, speakers, preview }: { block: Block; speakers: BlockSpeaker[]; preview: boolean }) {
@@ -302,15 +506,56 @@ function BlockView({ block, speakers, preview }: { block: Block; speakers: Block
   }
 }
 
-/** The body of a built page. Used on the live site and, with preview, inside the editor. */
-export function PageBlocks({ blocks, speakers = [], preview = false }: { blocks: Block[]; speakers?: BlockSpeaker[]; preview?: boolean }) {
+/**
+ * The body of a page: the club's own pages and pages officers build. Used on the live site and, with preview, inside the editor.
+ * `renderDynamic` supplies the sections that read live data (meetings, speakers, people); the editor preview shows a placeholder.
+ */
+export function PageBlocks({
+  blocks,
+  speakers = [],
+  preview = false,
+  ctx,
+  renderDynamic,
+  site = false,
+}: {
+  blocks: Block[];
+  speakers?: BlockSpeaker[];
+  preview?: boolean;
+  ctx?: PageCtx;
+  renderDynamic?: (block: Block) => ReactNode;
+  /** The club's own pages: no extra spacing, since their sections bring their own. */
+  site?: boolean;
+}) {
+  const context = ctx ?? previewCtx();
   return (
-    <div className="blocks">
-      {blocks.map((block) => (
-        <section key={block.id} className={`blk blk-${block.type}`}>
-          <BlockView block={block} speakers={speakers} preview={preview} />
-        </section>
-      ))}
+    <div className={site ? "blocks sys" : "blocks"}>
+      {blocks.map((block) => {
+        if (SITE_SECTION_TYPES.has(block.type)) {
+          if (DYNAMIC_SECTION_TYPES.has(block.type)) {
+            return (
+              <Fragment key={block.id}>
+                {renderDynamic ? (
+                  renderDynamic(block)
+                ) : (
+                  <div className="wrap" style={{ padding: "28px 0" }}>
+                    <div className="blk-ph">{blockDef(block.type)?.label}: the live content appears here on the real page.</div>
+                  </div>
+                )}
+              </Fragment>
+            );
+          }
+          return (
+            <Fragment key={block.id}>
+              <SiteSection block={block} ctx={context} />
+            </Fragment>
+          );
+        }
+        return (
+          <section key={block.id} className={`blk blk-${block.type}`}>
+            <BlockView block={block} speakers={speakers} preview={preview} />
+          </section>
+        );
+      })}
     </div>
   );
 }

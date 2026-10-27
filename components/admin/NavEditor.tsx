@@ -33,10 +33,10 @@ export function NavEditor({ initial, options }: { initial: Item[]; options: Opti
         {items.map((item, i) => {
           const isCustom = !known.has(item.href);
           return (
-            <div key={i} className={item.visible ? "nav-row" : "nav-row is-hidden"}>
+            <div key={i} className={item.visible ? "ne-row" : "ne-row is-hidden"}>
               <span className="story-n">{i + 1}</span>
               <input value={item.label} maxLength={30} aria-label="Menu text" placeholder="Menu text" onChange={(e) => set(i, { label: e.target.value })} disabled={!writable} />
-              <div className="nav-dest">
+              <div className="ne-dest">
                 <select
                   aria-label="Goes to"
                   value={isCustom ? CUSTOM : item.href}
@@ -64,10 +64,10 @@ export function NavEditor({ initial, options }: { initial: Item[]; options: Opti
                 </select>
                 {isCustom ? <input value={item.href} aria-label="Web address" placeholder="https://…" onChange={(e) => set(i, { href: e.target.value })} disabled={!writable} /> : null}
               </div>
-              <label className="nav-show">
+              <label className="ne-show">
                 <input type="checkbox" checked={item.visible} disabled={!writable} onChange={(e) => set(i, { visible: e.target.checked })} /> Show
               </label>
-              <div className="nav-tools">
+              <div className="ne-tools">
                 <button type="button" className="btn" disabled={!writable || i === 0} onClick={() => setItems((l) => move(l, i, i - 1))} aria-label="Move up">↑</button>
                 <button type="button" className="btn" disabled={!writable || i === items.length - 1} onClick={() => setItems((l) => move(l, i, i + 1))} aria-label="Move down">↓</button>
                 <button type="button" className="btn danger" disabled={!writable} onClick={() => setItems((l) => l.filter((_, idx) => idx !== i))} aria-label="Remove">✕</button>

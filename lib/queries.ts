@@ -3,7 +3,10 @@ import { prisma } from "@/lib/db";
 import { safeHttpUrl } from "@/lib/safe-url";
 import { speakerSlug } from "@/lib/site";
 import { DEFAULT_NAV, type NavLink } from "@/lib/nav";
-import { sanitizeBlocks } from "@/lib/page-blocks";
+import { sanitizeBlocks, type Block } from "@/lib/page-blocks";
+import { isSystemSlug, systemPageDef } from "@/lib/default-pages";
+import type { PageCtx } from "@/lib/page-context";
+import { formatShortDate } from "@/lib/utils";
 import { SITE_IMAGE_SLOTS, resolveSiteImage, type ResolvedImage, type SiteImageSlot } from "@/lib/site-images";
 
 export async function getLivePageBlocks(slug: string) {
@@ -157,7 +160,36 @@ export async function getNavLinks(): Promise<NavLink[]> {
 
 /** A published page built with the page builder, or null. */
 export async function getCustomPage(slug: string) {
+  if (isSystemSlug(slug)) return null; // the club's own pages are served from their own addresses
   const page = await prisma.customPage.findUnique({ where: { slug } });
   if (!page || page.status !== "LIVE") return null;
   return { ...page, blocks: sanitizeBlocks(page.blocks) };
+}
+
+/** One of the club's own pages (home, meetings, ...): the officers' saved version, or the original design. */
+export async function getSystemPage(slug: string): Promise<{ title: string; description: string; blocks: Block[]; edited: boolean }> {
+  const def = systemPageDef(slug);
+  if (!def) throw new Error(`Unknown system page ${slug}`);
+  const row = await prisma.customPage.findUnique({ where: { slug } });
+  if (!row) return { title: def.title, description: def.description, blocks: def.blocks, edited: false };
+  const blocks = sanitizeBlocks(row.blocks);
+  return { title: row.title || def.title, description: row.description || def.description, blocks: blocks.length ? blocks : def.blocks, edited: true };
+}
+
+/** Everything site-section blocks need besides their own fields. */
+export async function getPageContext(): Promise<PageCtx> {
+  const [settings, images, next] = await Promise.all([getClubSettings(), getSiteImages(), getNextMeeting()]);
+  return {
+    settings: {
+      name: settings.name,
+      foundedYear: settings.foundedYear,
+      seasonLabel: settings.seasonLabel,
+      statMembers: settings.statMembers,
+      statSpeakers: settings.statSpeakers,
+      statSessions: settings.statSessions,
+      heroCaption: settings.heroCaption,
+    },
+    images,
+    nextLabel: next ? `NEXT SESSION · ${formatShortDate(next.date).toUpperCase()}` : "SCHEDULE TBA",
+  };
 }

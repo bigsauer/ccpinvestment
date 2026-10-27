@@ -42,7 +42,19 @@ export type BlockType =
   | "video"
   | "speakers"
   | "divider"
-  | "spacer";
+  | "spacer"
+  // Site sections: the building blocks the built-in pages are made of.
+  | "pageBanner"
+  | "homeHero"
+  | "logoBand"
+  | "homeStats"
+  | "featureGrid"
+  | "pitch"
+  | "ctaBand"
+  | "teamPeople"
+  | "meetingsSchedule"
+  | "speakerArchive"
+  | "joinForms";
 
 export type BlockDef = {
   type: BlockType;
@@ -52,6 +64,10 @@ export type BlockDef = {
   fields: FieldDef[];
   list?: ListDef;
   defaults: Record<string, unknown>;
+  /** Part of how the club's own pages are built. Shown under "Site sections" in the picker. */
+  site?: boolean;
+  /** Pulls live data (meetings, speakers, people), so the editor preview shows a placeholder. */
+  dynamic?: boolean;
 };
 
 export type Block = { id: string; type: BlockType } & Record<string, unknown>;
@@ -311,7 +327,222 @@ export const BLOCK_DEFS: BlockDef[] = [
     ],
     defaults: { size: "medium" },
   },
+
+  /* ───── Site sections ───── */
+  {
+    type: "pageBanner",
+    label: "Page title banner",
+    description: "The big title at the top of a page, over a photo.",
+    icon: "▭",
+    site: true,
+    fields: [
+      { key: "crumbs", label: "Small line above the title", kind: "text", help: "Type {season} to show the current season label." },
+      { key: "headline", label: "Title", kind: "text", help: "Put *stars* around the words you want in italics." },
+      { key: "lede", label: "Intro paragraph", kind: "textarea" },
+      { key: "caption", label: "Small caption, bottom right (optional)", kind: "text" },
+      {
+        key: "imageSlot",
+        label: "Photo",
+        kind: "select",
+        help: "These photos are changed under Site images. Choose “Plain” for no photo, or upload one below.",
+        options: [
+          { value: "", label: "Plain (no photo)" },
+          { value: "meetings-banner", label: "Meetings banner photo" },
+          { value: "speakers-banner", label: "Speakers banner photo" },
+          { value: "team-banner", label: "Team banner photo" },
+        ],
+      },
+      { key: "image", label: "Or use a different photo", kind: "image" },
+    ],
+    defaults: { crumbs: "", headline: "A page title", lede: "", caption: "", imageSlot: "", image: "" },
+  },
+  {
+    type: "homeHero",
+    label: "Home page opening",
+    description: "The large photo, headline and buttons that open the home page.",
+    icon: "◩",
+    site: true,
+    fields: [
+      { key: "headline", label: "Headline", kind: "textarea", help: "A new line starts a new row. *Stars* make italic words; **double stars** make red words." },
+      { key: "lede", label: "Intro paragraph", kind: "textarea" },
+      { key: "primaryLabel", label: "First button text", kind: "text" },
+      { key: "primaryHref", label: "First button goes to", kind: "url" },
+      { key: "secondaryLabel", label: "Second button text", kind: "text" },
+      { key: "secondaryHref", label: "Second button goes to", kind: "url" },
+    ],
+    defaults: {
+      headline: "Where the next generation\nof *investors* **meets the market.**",
+      lede: "A student-run club at Chaminade College Preparatory School bringing working professionals — portfolio managers, bankers, founders — into the room with students who are serious about finance.",
+      primaryLabel: "Apply to join",
+      primaryHref: "/get-involved?tab=students",
+      secondaryLabel: "View schedule",
+      secondaryHref: "/meetings",
+    },
+  },
+  {
+    type: "logoBand",
+    label: "Club and school logos",
+    description: "The strip with the club badge and the school seal.",
+    icon: "◎",
+    site: true,
+    fields: [],
+    defaults: {},
+  },
+  {
+    type: "homeStats",
+    label: "Club numbers (home page)",
+    description: "Members, speakers, sessions and year founded, counting up. The numbers are set in Settings.",
+    icon: "№",
+    site: true,
+    fields: [],
+    defaults: {},
+  },
+  {
+    type: "featureGrid",
+    label: "Headline with three points",
+    description: "A section heading and intro with a row of numbered points.",
+    icon: "▦",
+    site: true,
+    fields: [
+      { key: "label", label: "Small label", kind: "text" },
+      { key: "heading", label: "Heading", kind: "text", help: "Put *stars* around italic words." },
+      { key: "intro", label: "Intro paragraph", kind: "textarea" },
+    ],
+    list: {
+      key: "items",
+      label: "Points",
+      itemLabel: "Point",
+      max: 6,
+      fields: [
+        { key: "num", label: "Small label (e.g. 01 / GUESTS)", kind: "text" },
+        { key: "title", label: "Title", kind: "text" },
+        { key: "text", label: "Text", kind: "textarea" },
+      ],
+    },
+    defaults: {
+      label: "What we do",
+      heading: "Not a finance class.\n*A working room.*",
+      intro: "Every session runs like a real meeting: a guest speaker, a prepared discussion, student-led market commentary, and a mock portfolio members pitch into and track.",
+      items: [
+        { num: "01 / GUESTS", title: "Real professionals.", text: "Portfolio managers, analysts, founders, and bankers walk members through how decisions actually get made." },
+        { num: "02 / PORTFOLIO", title: "A book you run.", text: "Members pitch ideas into a paper portfolio, defend them, and track performance against the benchmark." },
+        { num: "03 / NETWORK", title: "People who return calls.", text: "Chaminade alumni work across every major bank, fund, and consulting firm. The club is the fastest way in." },
+      ],
+    },
+  },
+  {
+    type: "pitch",
+    label: "Photo with message and button",
+    description: "A framed photo beside a heading, two paragraphs and a button (home page style).",
+    icon: "◫",
+    site: true,
+    fields: [
+      { key: "label", label: "Small label", kind: "text" },
+      { key: "heading", label: "Heading", kind: "text", help: "Put *stars* around italic words." },
+      { key: "body1", label: "First paragraph", kind: "textarea" },
+      { key: "body2", label: "Second paragraph", kind: "textarea" },
+      { key: "buttonLabel", label: "Button text", kind: "text" },
+      { key: "buttonHref", label: "Button goes to", kind: "url" },
+    ],
+    defaults: {
+      label: "Inside the club",
+      heading: "Run by students, *built for real work.*",
+      body1: "Members share the work of outreach, programming, and the portfolio. Everyone comes prepared — with reading done, questions ready, and pitches that can be defended.",
+      body2: "No busywork. The goal is reps: the kind of reps that make it obvious, five years from now, who took this seriously in high school.",
+      buttonLabel: "Meet the team",
+      buttonHref: "/team",
+    },
+  },
+  {
+    type: "ctaBand",
+    label: "Closing call to action",
+    description: "The band near the bottom of a page with two buttons.",
+    icon: "▬",
+    site: true,
+    fields: [
+      { key: "heading", label: "Headline", kind: "text" },
+      { key: "primaryLabel", label: "First button text", kind: "text" },
+      { key: "primaryHref", label: "First button goes to", kind: "url" },
+      { key: "secondaryLabel", label: "Second button text", kind: "text" },
+      { key: "secondaryHref", label: "Second button goes to", kind: "url" },
+    ],
+    defaults: {
+      heading: "Join us for the next session.",
+      primaryLabel: "Apply",
+      primaryHref: "/get-involved?tab=students",
+      secondaryLabel: "See schedule",
+      secondaryHref: "/meetings",
+    },
+  },
+  {
+    type: "teamPeople",
+    label: "People: officers, members, advisor",
+    description: "Officers, members with photos and the faculty advisor, with the three values underneath. People come from the admin.",
+    icon: "☺",
+    site: true,
+    dynamic: true,
+    fields: [
+      { key: "label", label: "Small label", kind: "text" },
+      { key: "heading", label: "Heading", kind: "text", help: "Put *stars* around italic words." },
+      { key: "intro", label: "Intro paragraph", kind: "textarea" },
+    ],
+    list: {
+      key: "values",
+      label: "Values (shown under the people)",
+      itemLabel: "Value",
+      max: 6,
+      fields: [
+        { key: "k", label: "Small label (e.g. 01 / CULTURE)", kind: "text" },
+        { key: "title", label: "Title", kind: "text" },
+        { key: "text", label: "Text", kind: "textarea" },
+      ],
+    },
+    defaults: {
+      label: "The team",
+      heading: "The people *behind it.*",
+      intro: "Student-run end to end. The work is shared, with a faculty advisor behind us.",
+      values: [
+        { k: "01 / CULTURE", title: "Preparation matters.", text: "Members show up having read the brief, with questions. Guests notice." },
+        { k: "02 / OWNERSHIP", title: "Members do the work.", text: "Every event, contact, and meeting agenda is owned by students working together. No hand-holding." },
+        { k: "03 / STANDARD", title: "Professional bar.", text: "What's good enough for finance professionals is what's good enough for us." },
+      ],
+    },
+  },
+  {
+    type: "meetingsSchedule",
+    label: "Meetings: next session, schedule and past sessions",
+    description: "The whole meetings body. Everything comes from the Meetings and Speakers sections.",
+    icon: "▤",
+    site: true,
+    dynamic: true,
+    fields: [],
+    defaults: {},
+  },
+  {
+    type: "speakerArchive",
+    label: "Speakers: archive with filters",
+    description: "Every speaker, with filters, profile pop-ups and career stories. Comes from the Speakers section.",
+    icon: "☰",
+    site: true,
+    dynamic: true,
+    fields: [],
+    defaults: {},
+  },
+  {
+    type: "joinForms",
+    label: "Join and speak forms",
+    description: "The two doors and their application forms.",
+    icon: "✎",
+    site: true,
+    dynamic: true,
+    fields: [],
+    defaults: {},
+  },
 ];
+
+/** Types that bring their own full-width layout, so they are not wrapped like ordinary content blocks. */
+export const SITE_SECTION_TYPES = new Set<string>(BLOCK_DEFS.filter((d) => d.site).map((d) => d.type));
+export const DYNAMIC_SECTION_TYPES = new Set<string>(BLOCK_DEFS.filter((d) => d.dynamic).map((d) => d.type));
 
 export function blockDef(type: string) {
   return BLOCK_DEFS.find((d) => d.type === type) ?? null;

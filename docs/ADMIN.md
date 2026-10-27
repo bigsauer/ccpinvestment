@@ -36,7 +36,7 @@ Sign in at **/admin** (for example `www.ccpinvestmentclub.com/admin`). Officers 
 | Add or edit a speaker, photo, bio, career story | Speakers |
 | Add members, upload photos (shown on the Team page) | Members |
 | Schedule a meeting, publish it, add RSVPs | Meetings (only Published ones show publicly) |
-| Change page headlines and intro text | Site content |
+| Edit any page's wording and sections, or build a new page (home, meetings, speakers, team and get-involved are all built this way) | Pages |
 | Swap the big photos (home page, page banners), set the crop, preview on computer and phone | Site images |
 | Change home page numbers, season, location, contact, and the class years on the join form | Settings |
 | See who changed what | Activity log |

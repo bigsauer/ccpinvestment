@@ -4,12 +4,13 @@ import { NavEditor } from "@/components/admin/NavEditor";
 import { Topbar } from "@/components/admin/Topbar";
 import { resetNavigation, saveNavigation } from "@/lib/actions/pages";
 import { prisma } from "@/lib/db";
+import { SYSTEM_SLUGS } from "@/lib/default-pages";
 import { BUILT_IN_PAGES, DEFAULT_NAV } from "@/lib/nav";
 
 export default async function NavigationPage() {
   const [rows, pages] = await Promise.all([
     prisma.navItem.findMany({ orderBy: { position: "asc" } }),
-    prisma.customPage.findMany({ where: { status: "LIVE" }, select: { slug: true, title: true }, orderBy: { title: "asc" } }),
+    prisma.customPage.findMany({ where: { status: "LIVE", slug: { notIn: SYSTEM_SLUGS } }, select: { slug: true, title: true }, orderBy: { title: "asc" } }),
   ]);
   const customised = rows.length > 0;
   const initial = customised ? rows.map((r) => ({ label: r.label, href: r.href, visible: r.visible })) : DEFAULT_NAV.map((l) => ({ ...l, visible: true }));

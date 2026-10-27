@@ -158,7 +158,18 @@ export function PageBuilder({ initial, links }: { initial: Block[]; links: LinkO
 
         {picker ? (
           <div className="pb-picker">
-            {BLOCK_DEFS.map((def) => (
+            <div className="pb-picker-h">Content</div>
+            {BLOCK_DEFS.filter((d) => !d.site).map((def) => (
+              <button key={def.type} type="button" className="pb-pick" onClick={() => add(def.type)}>
+                <span className="ic">{def.icon}</span>
+                <span>
+                  <b>{def.label}</b>
+                  <small>{def.description}</small>
+                </span>
+              </button>
+            ))}
+            <div className="pb-picker-h">Site sections (what the club&apos;s own pages are built from)</div>
+            {BLOCK_DEFS.filter((d) => d.site).map((def) => (
               <button key={def.type} type="button" className="pb-pick" onClick={() => add(def.type)}>
                 <span className="ic">{def.icon}</span>
                 <span>

@@ -5,6 +5,7 @@ import { PageStatus, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import type { FormState } from "@/lib/form-state";
 import { logActivity, requireWriter } from "@/lib/guard";
+import { isSystemSlug, systemPageDef } from "@/lib/default-pages";
 import { sanitizeNav } from "@/lib/nav";
 import { checkSlug, cleanImagePath, sanitizeBlocks, slugify } from "@/lib/page-blocks";
 import { done, fail, revalidateAdmin, revalidatePublic, str } from "@/lib/actions/util";
@@ -20,6 +21,8 @@ function refreshSite(slug?: string) {
 export async function savePage(_prev: FormState, formData: FormData): Promise<FormState> {
   try {
     const user = await requireWriter();
+    const system = str(formData, "system");
+    if (system) return await saveSystemPage(user.name, system, formData);
     const id = str(formData, "id");
     const title = str(formData, "title");
     if (!title) throw new Error("Give the page a title.");
@@ -68,11 +71,64 @@ export async function savePage(_prev: FormState, formData: FormData): Promise<Fo
   }
 }
 
+/** Saves one of the club's own pages (home, meetings, ...). Its address and visibility stay fixed. */
+async function saveSystemPage(actorName: string, slug: string, formData: FormData): Promise<FormState> {
+  if (!isSystemSlug(slug)) throw new Error("Unknown page");
+  const def = systemPageDef(slug)!;
+  let parsed: unknown = [];
+  try {
+    parsed = JSON.parse(str(formData, "blocks") || "[]");
+  } catch {
+    throw new Error("The page content could not be read. Reload the page and try again.");
+  }
+  const blocks = sanitizeBlocks(parsed);
+  if (blocks.length === 0) throw new Error("A page needs at least one section. Use “Reset to the original” to start over.");
+  const data = {
+    title: str(formData, "title").slice(0, 120) || def.title,
+    description: str(formData, "description").slice(0, 300) || def.description,
+    blocks: blocks as unknown as Prisma.InputJsonValue,
+    status: "LIVE" as PageStatus,
+    updatedBy: actorName,
+  };
+  await prisma.customPage.upsert({
+    where: { slug },
+    create: { slug, bannerUrl: null, ...data },
+    update: data,
+  });
+  await logActivity(actorName, `Page saved — ${def.title}`, "Page", slug);
+  revalidateAdmin();
+  refreshSite(slug === "home" ? undefined : slug);
+  revalidatePath(def.path);
+  return done("Saved. It is live within a minute.");
+}
+
+/** Puts one of the club's own pages back to its original design and wording. */
+export async function resetSystemPage(slug: string): Promise<FormState> {
+  try {
+    const user = await requireWriter();
+    const def = isSystemSlug(slug) ? systemPageDef(slug) : null;
+    if (!def) throw new Error("Unknown page");
+    await prisma.customPage.upsert({
+      where: { slug },
+      create: { slug, title: def.title, description: def.description, blocks: def.blocks as unknown as Prisma.InputJsonValue, status: "LIVE", updatedBy: "Original design" },
+      update: { title: def.title, description: def.description, blocks: def.blocks as unknown as Prisma.InputJsonValue, status: "LIVE", updatedBy: "Original design" },
+    });
+    await logActivity(user, `Page put back to the original — ${def.title}`, "Page", slug);
+    revalidateAdmin();
+    refreshSite(slug === "home" ? undefined : slug);
+    revalidatePath(def.path);
+    return { ok: true };
+  } catch (error) {
+    return fail(error);
+  }
+}
+
 export async function deletePage(id: string): Promise<FormState> {
   try {
     const user = await requireWriter();
     const page = await prisma.customPage.findUnique({ where: { id } });
     if (!page) throw new Error("Page not found");
+    if (isSystemSlug(page.slug)) throw new Error("This is one of the club's own pages. It can be edited or reset, not deleted.");
     await prisma.customPage.delete({ where: { id } });
     // A menu link that pointed at it would now lead nowhere, so drop it.
     await prisma.navItem.deleteMany({ where: { href: `/${page.slug}` } });
@@ -90,6 +146,7 @@ export async function duplicatePage(id: string): Promise<FormState> {
     const user = await requireWriter();
     const source = await prisma.customPage.findUnique({ where: { id } });
     if (!source) throw new Error("Page not found");
+    if (isSystemSlug(source.slug)) throw new Error("Built-in pages can't be duplicated. Use “Reset to the original” to undo changes.");
     let slug = `${source.slug}-copy`.slice(0, 60);
     for (let n = 2; await prisma.customPage.findUnique({ where: { slug }, select: { id: true } }); n++) slug = `${source.slug}-copy-${n}`.slice(0, 60);
     const copy = await prisma.customPage.create({

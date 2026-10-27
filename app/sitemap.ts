@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/db";
+import { SYSTEM_SLUGS } from "@/lib/default-pages";
 import { absoluteUrl, speakerSlug } from "@/lib/site";
 
 export const revalidate = 3600;
@@ -13,7 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       orderBy: { updatedAt: "desc" },
       select: { updatedAt: true },
     }),
-    prisma.customPage.findMany({ where: { status: "LIVE" }, select: { slug: true, updatedAt: true } }),
+    prisma.customPage.findMany({ where: { status: "LIVE", slug: { notIn: SYSTEM_SLUGS } }, select: { slug: true, updatedAt: true } }),
   ]);
 
   const pages: MetadataRoute.Sitemap = [

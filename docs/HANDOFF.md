@@ -32,9 +32,8 @@ See `docs/ADMIN.md` (also in the admin under Help & handoff). Short version:
 | Answer student and speaker forms | Inquiries |
 | Add a speaker, photo, career story | Speakers |
 | Schedule and publish a meeting | Meetings |
-| Add or edit a whole page (no code) | Pages |
+| Edit any page, including Home, Meetings, Speakers, Team and Get involved, or build a new one (no code) | Pages |
 | Change the top menu | Navigation |
-| Change page headlines and intro text | Page wording |
 | Replace the big photos | Site images |
 | Club name, season, home numbers, class years | Settings |
 | Invite or remove officers | Officers |
@@ -60,5 +59,6 @@ Use **Export CSV** on Members, Inquiries and Speakers a few times a year and kee
 ## 7. For a developer picking this up
 
 - Stack and decisions: `AGENTS.md`. Hosting on the school server: `deploy/iis/README.md`.
+- The club's own pages are defined in `lib/default-pages.ts` (also the "reset to original" source) and drawn by `components/public/PageBlocks.tsx` with the live-data sections in `components/public/sections/`. `npx tsx scripts/print-system-seed.ts` prints SQL that stores them in the database.
 - Database changes live in `prisma/migrations`. Page-builder blocks are defined in `lib/page-blocks.ts` (add one definition, one renderer case in `components/public/PageBlocks.tsx`).
 - Content never needs a deploy. Code changes do: `vercel deploy --prod`, and `scripts\update-iis.cmd` on the school server.

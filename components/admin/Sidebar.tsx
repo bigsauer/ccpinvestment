@@ -22,7 +22,6 @@ const NAV = [
       { href: "/admin/members", label: "Members", icon: "users" },
       { href: "/admin/pages", label: "Pages", icon: "layers" },
       { href: "/admin/navigation", label: "Navigation", icon: "menu" },
-      { href: "/admin/content", label: "Page wording", icon: "file" },
       { href: "/admin/images", label: "Site images", icon: "image" },
     ],
   },
