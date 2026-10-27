@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Sidebar } from "@/components/admin/Sidebar";
 import { WriteProvider } from "@/components/admin/WriteGate";
 
 export function AdminShell({
-  collapsed,
+  collapsed: initialCollapsed,
   openApps,
   pendingRequests,
   writable,
@@ -16,10 +16,35 @@ export function AdminShell({
   openApps: number;
   pendingRequests: number;
   writable: boolean;
-  user: { name: string; role: string; classYear?: string | null };
+  user: { name: string; role: string; classYear?: string | null; badge?: string };
   children: React.ReactNode;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(initialCollapsed);
+
+  function toggleCollapsed() {
+    setCollapsed((current) => {
+      const next = !current;
+      try {
+        document.cookie = `admin-sidebar=${next ? "1" : "0"}; path=/; max-age=31536000; samesite=lax`;
+      } catch {
+        /* the sidebar still works without remembering the choice */
+      }
+      return next;
+    });
+  }
+
+  // "[" collapses or expands the sidebar, unless you are typing in a field.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement | null;
+      if (e.key !== "[" || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (el && (el.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName))) return;
+      toggleCollapsed();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
 
   return (
     <WriteProvider writable={writable}>
@@ -28,6 +53,7 @@ export function AdminShell({
           collapsed={collapsed}
           openApps={openApps}
           pendingRequests={pendingRequests}
+          onToggleCollapsed={toggleCollapsed}
           user={user}
           mobileOpen={mobileOpen}
           onCloseMobile={() => setMobileOpen(false)}

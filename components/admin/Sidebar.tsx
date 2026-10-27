@@ -141,6 +141,7 @@ function Icon({ name }: { name: string }) {
 
 export function Sidebar({
   collapsed,
+  onToggleCollapsed,
   openApps,
   pendingRequests,
   user,
@@ -148,19 +149,14 @@ export function Sidebar({
   onCloseMobile,
 }: {
   collapsed: boolean;
+  onToggleCollapsed: () => void;
   openApps: number;
   pendingRequests: number;
-  user: { name: string; role: string; classYear?: string | null };
+  user: { name: string; role: string; classYear?: string | null; badge?: string };
   mobileOpen: boolean;
   onCloseMobile: () => void;
 }) {
   const pathname = usePathname();
-
-  function toggle() {
-    const next = collapsed ? "0" : "1";
-    document.cookie = `admin-sidebar=${next}; path=/; max-age=31536000; samesite=lax`;
-    window.location.reload();
-  }
 
   return (
     <>
@@ -177,11 +173,6 @@ export function Sidebar({
             <span>Officer admin</span>
             <span className="dot" />
           </div>
-          <button className="side-toggle" type="button" onClick={toggle} aria-label="Collapse sidebar">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-          </button>
         </div>
         <nav className="side-nav">
           {NAV.map((group) => (
@@ -209,6 +200,19 @@ export function Sidebar({
             </div>
           ))}
         </nav>
+        <button
+          type="button"
+          className="side-collapse"
+          onClick={onToggleCollapsed}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          title={collapsed ? "Expand sidebar  ( [ )" : "Collapse sidebar  ( [ )"}
+          aria-expanded={!collapsed}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          <span className="lbl">Collapse menu</span>
+        </button>
         <div className="side-foot">
           <div className="side-user">
             <div className="av">{initials(user.name)}</div>
@@ -218,6 +222,7 @@ export function Sidebar({
                 {user.role}
                 {user.classYear ? ` · '${user.classYear}` : ""}
               </div>
+              {user.badge ? <div className="badge-super">{user.badge}</div> : null}
             </div>
             <Link href="/admin/account" className="more" aria-label="My account" title="My account" onClick={onCloseMobile}>
               ⚙

@@ -42,7 +42,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       writable={canWriteContent(actor)}
       user={{
         name: officer?.name ?? actor.name,
-        role: actor.isSuperAdmin ? `Super admin · ${roleLabel(actor.role)}` : roleLabel(actor.role),
+        role: roleLabel(actor.role),
+        badge: actor.isSuperAdmin ? "Super admin" : undefined,
         classYear: officer?.classYear,
       }}
     >

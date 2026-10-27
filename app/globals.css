@@ -2067,3 +2067,30 @@ h3.blk-heading { font-size: clamp(20px, 2.6vw, 26px); }
 @media (max-width: 800px) { .nav-row { grid-template-columns: 28px 1fr; } .nav-row > :nth-child(n+3) { grid-column: 1 / -1; } }
 .help-list { padding-left: 1.2em; display: grid; gap: 8px; color: var(--ink-2); font-size: 14.5px; line-height: 1.55; list-style: disc; }
 ol.help-list { list-style: decimal; }
+
+/* === Sidebar: a proper collapse button, tidy user block === */
+.side-collapse {
+  display: flex; align-items: center; gap: 10px; width: calc(100% - 20px); margin: 0 10px 10px;
+  padding: 11px 12px; border: 1px solid var(--side-line); border-radius: 10px;
+  background: rgba(255,255,255,0.04); color: var(--side-ink-2); font: inherit; font-size: 13px; cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.side-collapse:hover { background: rgba(255,255,255,0.09); color: #fff; border-color: rgba(255,255,255,0.22); }
+.side-collapse:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+.side-collapse svg { width: 16px; height: 16px; flex: none; transition: transform .22s; }
+.shell.collapsed .side-collapse { justify-content: center; padding: 11px 0; width: calc(100% - 16px); margin: 0 8px 10px; }
+.shell.collapsed .side-collapse .lbl { display: none; }
+.shell.collapsed .side-collapse svg { transform: rotate(180deg); }
+.side-user .role { white-space: normal; line-height: 1.35; }
+.side-user .badge-super { display: inline-block; margin-top: 4px; padding: 2px 7px; border-radius: 999px; background: rgba(196,30,40,0.22); color: #ff9aa0; font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; }
+.side-user .more { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; }
+.side-user .more:hover { background: rgba(255,255,255,0.08); }
+@media (max-width: 900px) { .side-collapse { display: none; } }
+
+/* === Settings tabs: a clean list, a scrolling row on small screens === */
+.settings-nav { display: flex; flex-direction: column; gap: 2px; }
+.settings-nav .item { display: block; text-decoration: none; white-space: nowrap; }
+@media (max-width: 900px) {
+  .settings-nav { flex-direction: row; gap: 6px; overflow-x: auto; padding: 8px; -webkit-overflow-scrolling: touch; }
+  .settings-nav .item { flex: none; padding: 9px 14px; border-radius: 9px; }
+}
