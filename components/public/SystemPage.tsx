@@ -26,7 +26,7 @@ function renderDynamic(block: Block): ReactNode {
         title: String(v.title ?? ""),
         text: String(v.text ?? ""),
       }));
-      return <TeamSection label={str(block, "label")} heading={str(block, "heading")} intro={str(block, "intro")} values={values} />;
+      return <TeamSection label={str(block, "label")} heading={str(block, "heading")} intro={str(block, "intro")} showOfficers={str(block, "showOfficers") === "show"} values={values} />;
     }
     default:
       return null;

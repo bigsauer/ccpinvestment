@@ -485,6 +485,16 @@ export const BLOCK_DEFS: BlockDef[] = [
       { key: "label", label: "Small label", kind: "text" },
       { key: "heading", label: "Heading", kind: "text", help: "Put *stars* around italic words." },
       { key: "intro", label: "Intro paragraph", kind: "textarea" },
+      {
+        key: "showOfficers",
+        label: "Officer cards",
+        kind: "select",
+        help: "Officer accounts always stay in the admin. This only controls whether their cards show on this page.",
+        options: [
+          { value: "hide", label: "Hide officer cards" },
+          { value: "show", label: "Show officer cards" },
+        ],
+      },
     ],
     list: {
       key: "values",
@@ -501,6 +511,7 @@ export const BLOCK_DEFS: BlockDef[] = [
       label: "The team",
       heading: "The people *behind it.*",
       intro: "Student-run end to end. The work is shared, with a faculty advisor behind us.",
+      showOfficers: "hide",
       values: [
         { k: "01 / CULTURE", title: "Preparation matters.", text: "Members show up having read the brief, with questions. Guests notice." },
         { k: "02 / OWNERSHIP", title: "Members do the work.", text: "Every event, contact, and meeting agenda is owned by students working together. No hand-holding." },

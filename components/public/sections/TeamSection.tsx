@@ -9,11 +9,12 @@ type Props = {
   label: string;
   heading: string;
   intro: string;
+  showOfficers: boolean;
   values: { k: string; title: string; text: string }[];
 };
 
 /** Officers, members with photos and the faculty advisor, then the values. People come from the admin. */
-export async function TeamSection({ label, heading, intro, values }: Props) {
+export async function TeamSection({ label, heading, intro, showOfficers, values }: Props) {
   const [officers, members] = await Promise.all([getPublicOfficers(), getPublicMembers()]);
   const leadership = officers.filter((officer) => officer.role !== "ADVISOR");
   const advisor = officers.find((officer) => officer.role === "ADVISOR");
@@ -30,7 +31,7 @@ export async function TeamSection({ label, heading, intro, values }: Props) {
             </div>
             <p>{intro}</p>
           </div>
-          {leadership.length > 0 ? (
+          {showOfficers && leadership.length > 0 ? (
           <div className="officers">
             {leadership.map((officer) => (
               <div key={officer.id} className="officer">
