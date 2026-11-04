@@ -2102,3 +2102,40 @@ ol.help-list { list-style: decimal; }
 .page-banner .crumbs::before { content: ''; width: 20px; height: 1px; flex: none; }
 .page-banner:not(.gi-banner) h1 { font-size: clamp(38px, 5vw, 64px); letter-spacing: -0.035em; font-weight: 500; line-height: 1.02; margin-bottom: 20px; max-width: 18ch; text-wrap: balance; }
 .page-banner:not(.gi-banner) .lede { font-size: 17.5px; line-height: 1.55; max-width: 62ch; }
+
+/* === Past sessions: text cards for sessions without a photo, and a grid that fits how many there are === */
+.past-card.is-plain {
+  display: flex; flex-direction: column; justify-content: space-between; gap: 18px;
+  padding: 24px 26px; color: #fff; text-decoration: none; cursor: default;
+  background:
+    radial-gradient(ellipse 70% 80% at 100% 0%, rgba(196,30,40,0.38) 0%, transparent 62%),
+    radial-gradient(ellipse 60% 70% at 0% 100%, rgba(255,255,255,0.05) 0%, transparent 70%),
+    #121214;
+  border-color: #121214;
+  transition: transform .3s cubic-bezier(.2,.7,.2,1), box-shadow .3s;
+}
+.past-card.is-plain.is-link { cursor: pointer; }
+.past-card.is-plain.is-link:hover { transform: translateY(-3px); box-shadow: 0 24px 48px -28px rgba(0,0,0,0.55); }
+.past-card.is-plain .pc-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.past-card.is-plain .pc-date { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.7); }
+.past-card.is-plain .pc-tag { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; padding: 4px 9px; border-radius: 999px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18); color: rgba(255,255,255,0.88); }
+.past-card.is-plain h3 { font-size: 22px; font-weight: 500; letter-spacing: -0.02em; line-height: 1.2; margin: 0 0 6px; color: #fff; }
+.past-card.is-plain .pc-sub { font-size: 13px; color: #ff9aa0; margin-bottom: 12px; }
+.past-card.is-plain p { font-size: 14.5px; line-height: 1.6; color: rgba(255,255,255,0.78); max-width: 54ch; margin: 0; }
+.past-card.is-plain .pc-meta { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 11px; letter-spacing: 0.08em; color: rgba(255,255,255,0.5); padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.12); }
+/* One or two past sessions should not be stretched into the five-card mosaic. */
+.past-sessions[data-count="1"] { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; }
+.past-sessions[data-count="1"] .past-card:first-child { grid-row: auto; min-height: 260px; }
+.past-sessions[data-count="1"] .past-card:not(.is-plain) { min-height: 380px; }
+.past-sessions[data-count="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: auto; }
+.past-sessions[data-count="2"] .past-card:first-child { grid-row: auto; }
+.past-sessions[data-count="2"] .past-card { min-height: 300px; }
+.past-sessions[data-count="3"] { grid-template-rows: 280px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.past-sessions[data-count="3"] .past-card:first-child { grid-row: auto; }
+.past-sessions[data-count="4"] { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: 280px 280px; }
+.past-sessions[data-count="4"] .past-card:first-child { grid-row: auto; }
+@media (max-width: 900px) {
+  .past-sessions[data-count] { grid-template-columns: 1fr; grid-template-rows: none; }
+  .past-sessions[data-count] .past-card, .past-sessions[data-count] .past-card:first-child { grid-column: auto; grid-row: auto; min-height: 240px; height: auto; }
+  .past-card:not(.is-plain) { height: 260px; }
+}

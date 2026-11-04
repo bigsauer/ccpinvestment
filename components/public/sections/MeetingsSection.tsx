@@ -22,16 +22,40 @@ import { dayNumber, displayName, monthName, weekdayName } from "@/lib/utils";
 export async function MeetingsSection() {
   const [upcoming, pastMeetings, speakers] = await Promise.all([getUpcomingMeetings(), getPastMeetings(), getSpeakers()]);
   // Past sessions come from logged meetings; until officers log those, the speaker archive fills in.
-  const past: Array<{ key: string; href: string; photo: string | null; date: Date; title: string; sub: string }> =
+  type PastItem = {
+    key: string;
+    href: string | null;
+    photo: string | null;
+    date: Date;
+    title: string;
+    /** Small line under the title (a speaker's role, or what kind of session it was). */
+    sub: string;
+    description: string;
+    meta: string;
+    tag: string | null;
+  };
+  const STUDENT_PAST =
+    "Members presented the research their small groups did on the stocks the club assigned, and gave their recommendation on whether the club should diversify into each one.";
+  const past: PastItem[] =
     pastMeetings.length > 0
-      ? pastMeetings.slice(0, 5).map((m) => ({
-          key: m.id,
-          href: m.speaker ? `/speakers/${speakerSlug(m.speaker.firstName, m.speaker.lastName)}` : "/speakers",
-          photo: localPhoto(m.photoUrl ?? m.speaker?.photoUrl),
-          date: m.date,
-          title: m.speaker ? displayName(m.speaker.firstName, m.speaker.lastName) : "Session",
-          sub: m.speaker ? [m.speaker.title, m.speaker.firm].filter(Boolean).join(" · ") : m.topic,
-        }))
+      ? pastMeetings.slice(0, 5).map((m) => {
+          const studentLed = isStudentLed(m);
+          const role = m.speaker ? [m.speaker.title, m.speaker.firm].filter(Boolean).join(" · ") : "";
+          // A topic written for the upcoming card ("Members present...") reads wrong afterwards, so use the past-tense wording.
+          const topic = m.topic && !/^members present/i.test(m.topic.trim()) ? m.topic.trim() : "";
+          const bio = m.speaker?.bio ? m.speaker.bio.trim().slice(0, 170) + (m.speaker.bio.trim().length > 170 ? "…" : "") : "";
+          return {
+            key: m.id,
+            href: m.speaker ? `/speakers/${speakerSlug(m.speaker.firstName, m.speaker.lastName)}` : null,
+            photo: localPhoto(m.photoUrl ?? m.speaker?.photoUrl),
+            date: m.date,
+            title: m.speaker ? displayName(m.speaker.firstName, m.speaker.lastName) : m.format || "Club session",
+            sub: m.speaker ? role : studentLed ? "Student-led session · no outside speaker" : "Club session",
+            description: topic || (m.speaker ? bio : studentLed ? STUDENT_PAST : ""),
+            meta: [m.time, m.location].filter(Boolean).join(" · "),
+            tag: studentLed ? "Student-led" : m.speaker ? "Guest speaker" : null,
+          };
+        })
       : speakers
           .filter((sp) => sp.status === "PAST" && sp.sessionDate && localPhoto(sp.photoUrl))
           .slice(0, 5)
@@ -42,6 +66,9 @@ export async function MeetingsSection() {
             date: sp.sessionDate as Date,
             title: displayName(sp.firstName, sp.lastName),
             sub: [sp.title, sp.firm].filter(Boolean).join(" · "),
+            description: sp.topic || "",
+            meta: "",
+            tag: "Guest speaker",
           }));
   const next = upcoming[0] ?? null;
   const nextStudent = next ? isStudentLed(next) : false;
@@ -253,22 +280,45 @@ export async function MeetingsSection() {
           </Reveal>
           {past.length > 0 ? (
             <div className="past-sessions" data-count={past.length}>
-              {past.map((item) => (
-                <Link key={item.key} href={item.href} className="past-card">
-                  {item.photo ? (
-                    <Image src={item.photo} alt="" fill sizes="(max-width: 900px) 100vw, 40vw" />
+              {past.map((item) => {
+                const when = `${monthName(item.date)} ${dayNumber(item.date)} · ${item.date.getFullYear()}`;
+                if (!item.photo) {
+                  // No photo: a clean text card instead of an empty picture frame.
+                  const body = (
+                    <>
+                      <div className="pc-top">
+                        <span className="pc-date">{when}</span>
+                        {item.tag ? <span className="pc-tag">{item.tag}</span> : null}
+                      </div>
+                      <div className="pc-body">
+                        <h3>{item.title}</h3>
+                        {item.sub ? <div className="pc-sub">{item.sub}</div> : null}
+                        {item.description ? <p>{item.description}</p> : null}
+                      </div>
+                      {item.meta ? <div className="pc-meta">{item.meta}</div> : null}
+                    </>
+                  );
+                  return item.href ? (
+                    <Link key={item.key} href={item.href} className="past-card is-plain is-link">
+                      {body}
+                    </Link>
                   ) : (
-                    <div className="spkr-fallback" />
-                  )}
-                  <div className="past-overlay">
-                    <div className="date">
-                      {monthName(item.date)} {dayNumber(item.date)} · {item.date.getFullYear()}
+                    <div key={item.key} className="past-card is-plain">
+                      {body}
                     </div>
-                    <div className="title">{item.title}</div>
-                    <div className="sub">{item.sub}</div>
-                  </div>
-                </Link>
-              ))}
+                  );
+                }
+                return (
+                  <Link key={item.key} href={item.href ?? "/speakers"} className="past-card">
+                    <Image src={item.photo} alt="" fill sizes="(max-width: 900px) 100vw, 40vw" />
+                    <div className="past-overlay">
+                      <div className="date">{when}</div>
+                      <div className="title">{item.title}</div>
+                      <div className="sub">{item.sub}</div>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           ) : null}
           <div style={{ marginTop: 24, display: "flex", justifyContent: "flex-end" }}>
