@@ -1701,6 +1701,9 @@ button.gi-door { width: 100%; text-align: left; background: transparent; border:
 .up-title a:hover { color: var(--red); }
 .up-role { margin: 5px 0 0; font-size: 14px; color: var(--ink-3); }
 .up-text { margin: 0 0 16px; font-size: 15px; line-height: 1.58; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.up-topic { margin: 0 0 10px; font-size: 16px; line-height: 1.5; font-weight: 500; color: var(--ink); }
+.up-topic span { display: block; margin-bottom: 4px; font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 10.5px; font-weight: 400; letter-spacing: 0.1em; text-transform: uppercase; color: var(--red); }
+.up-card.is-student .up-topic { color: #fff; }
 .up-meta { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 0 0 18px; padding: 0; list-style: none; font-size: 13.5px; color: var(--ink-2); }
 .up-meta li { display: inline-flex; align-items: center; gap: 7px; }
 .up-meta svg { color: var(--ink-3); }

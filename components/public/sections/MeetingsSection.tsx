@@ -142,6 +142,12 @@ export async function MeetingsSection() {
                       </div>
                     </div>
                   </div>
+                  {next.speaker?.bio && next.topic ? (
+                    <p className="up-topic">
+                      <span>Topic</span>
+                      {next.topic}
+                    </p>
+                  ) : null}
                   <p className="bio">
                     {next.speaker?.bio ||
                       (next.speaker

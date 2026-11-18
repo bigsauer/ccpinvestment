@@ -62,6 +62,8 @@ export function UpcomingCard({ meeting, isNext }: { meeting: UpcomingMeeting; is
   const slug = s ? speakerSlug(s.firstName, s.lastName) : null;
   const role = s ? [s.title, s.firm].filter(Boolean).join(", ") : "";
   const blurb = s ? s.bio || meeting.topic : meeting.topic;
+  // With a guest speaker, show the topic on its own line above the bio (when there is a bio to separate it from).
+  const topicLine = s && s.bio && meeting.topic ? meeting.topic : "";
 
   return (
     <article className={["up-card", student ? "is-student" : "", isNext ? "is-next" : ""].filter(Boolean).join(" ")}>
@@ -110,6 +112,13 @@ export function UpcomingCard({ meeting, isNext }: { meeting: UpcomingMeeting; is
             </div>
           </div>
         )}
+
+        {topicLine ? (
+          <p className="up-topic">
+            <span>Topic</span>
+            {topicLine}
+          </p>
+        ) : null}
 
         {blurb ? <p className="up-text">{blurb}</p> : null}
 
