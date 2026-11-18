@@ -74,10 +74,22 @@ export async function getSpeakers() {
   const speakers = await prisma.speaker.findMany({
     orderBy: [{ status: "asc" }, { sessionDate: { sort: "desc", nulls: "last" } }],
   });
-  return speakers.map((speaker) => ({
-    ...speaker,
-    linkedinUrl: safeHttpUrl(speaker.linkedinUrl),
-  }));
+  const now = Date.now();
+  return speakers
+    .map((speaker) => ({
+      ...speaker,
+      // A speaker marked Upcoming becomes Past on its own once the session time has gone by,
+      // so nobody has to remember to flip the status after the meeting.
+      status: speaker.status === "UPCOMING" && speaker.sessionDate && speaker.sessionDate.getTime() < now ? ("PAST" as const) : speaker.status,
+      linkedinUrl: safeHttpUrl(speaker.linkedinUrl),
+    }))
+    .sort((a, b) => {
+      const rank = (s: { status: string }) => (s.status === "UPCOMING" ? 0 : 1);
+      if (rank(a) !== rank(b)) return rank(a) - rank(b);
+      const at = a.sessionDate?.getTime() ?? -Infinity;
+      const bt = b.sessionDate?.getTime() ?? -Infinity;
+      return bt - at;
+    });
 }
 
 export async function getPublicOfficers() {

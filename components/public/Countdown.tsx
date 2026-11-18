@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const COUNT_MS = 1500;
@@ -24,13 +25,30 @@ export function Countdown({ target }: { target: string }) {
   // 0..1 while the intro count-up runs; 1 once it has landed (or when motion is reduced).
   const [progress, setProgress] = useState(0);
 
+  const router = useRouter();
+
   useEffect(() => {
     const next = new Date(target);
-    const tick = () => setParts(partsUntil(next));
+    let refreshes = 0;
+    const tick = () => {
+      setParts(partsUntil(next));
+      // Once the session time has passed, reload the page data so this meeting moves to the past list
+      // and the next one takes its place. The cached page can lag by up to a minute, so retry a few times.
+      if (next.getTime() <= Date.now() && refreshes < 6) {
+        refreshes += 1;
+        router.refresh();
+      }
+    };
     tick();
     const id = window.setInterval(tick, 30000);
-    return () => window.clearInterval(id);
-  }, [target]);
+    // Fire right at the session time instead of waiting for the next 30-second tick.
+    const wait = next.getTime() - Date.now();
+    const at = wait > 0 && wait < 2147483647 ? window.setTimeout(tick, wait + 500) : 0;
+    return () => {
+      window.clearInterval(id);
+      if (at) window.clearTimeout(at);
+    };
+  }, [target, router]);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
